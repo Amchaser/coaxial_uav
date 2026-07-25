@@ -1,0 +1,48 @@
+# 阶段 1 初始参数；推力系数待标定后方可用于仿真。
+vehicle:
+  mass_kg: 8.2
+  gravity_m_s2: 9.8
+  inertia_kg_m2:
+    ixx: 0.18
+    iyy: 0.34
+    izz: 0.28
+    ixy: 0.0
+    ixz: 0.0
+    iyz: 0.0
+
+rotors:
+  count: 2
+  radius_m: 0.775
+  blade_chord_m: 0.058
+  blades_per_rotor: 2
+  upper_rotation: cw
+  lower_rotation: ccw
+  nominal_max_angular_speed_rad_s: 167.0
+  nominal_max_rpm: 1595.0
+  # 源报告数值；仅用于可追溯性，不直接作为本项目仿真系数。
+  source_thrust_coefficient_N_per_rad_s2: 1.53e-3
+  torque_coefficient_Nm_per_rad_s2: 1.40e-4
+  motor_time_constant_s: 0.075
+
+environment:
+  air_density_kg_m3: 1.225
+  water_model: static_visual_and_contact_only
+
+validation:
+  minimum_thrust_to_weight_ratio: 1.5
+  thrust_model_status: requires_calibration
+  target_total_thrust_N: 120.54
+  # 二选一的标定方向，不应同时作为最终参数直接套用。
+  required_kT_at_nominal_max_speed: 2.1610671e-3
+  required_max_angular_speed_at_nominal_kT_rad_s: 198.475
+  required_max_speed_at_nominal_kT_rpm: 1895.293
+
+simulation_thrust_model:
+  # T = kT_sim * omega^2；kT_sim 为等效标定值，已包含仿真海平面条件。
+  model: calibrated_quadratic
+  calibrated_thrust_coefficient_N_per_rad_s2: 2.1610671e-3
+  calibrated_at_max_angular_speed_rad_s: 167.0
+  design_max_total_thrust_N: 120.54
+  design_thrust_to_weight_ratio: 1.5
+  density_correction: none
+  status: design_baseline_pending_validation
