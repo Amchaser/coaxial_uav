@@ -1,0 +1,30 @@
+# Generated binaries and Python caches
+/build/
+__pycache__/
+*.py[cod]
+*.so
+
+# Runtime state and recorded test data
+/data/
+
+# Local agent and editor state
+/.agents/
+/.codex/
+.vscode/
+.idea/
+
+# Personal notes and project records that are not required to run
+/docs/
+/readme.txt
+/worlds/baseline_empty.sdf
+/共轴无人机模型参数适配gazebo建模.md
+
+# Office documents, lock files, and Windows alternate-stream exports
+*.docx
+~$*
+*:Zone.Identifier
+
+# Local logs and temporary files
+*.log
+*.tmp
+*~

@@ -2,6 +2,10 @@
 vehicle:
   mass_kg: 8.2
   gravity_m_s2: 9.8
+  sdf_mass_accounting:
+    base_link_mass_kg: 8.1
+    rotor_link_mass_kg_each: 0.05
+    total_modeled_mass_kg: 8.2
   inertia_kg_m2:
     ixx: 0.18
     iyy: 0.34
@@ -27,6 +31,14 @@ rotors:
 environment:
   air_density_kg_m3: 1.225
   water_model: static_visual_and_contact_only
+  near_surface_disturbance:
+    model: empirical_height_dependent_force_and_colored_torque
+    default_enabled: false
+    water_elevation_m: 0.0
+    rotor_plane_offset_m: 0.235
+    full_effect_height_ratio: 0.30
+    zero_effect_height_ratio: 1.50
+    presets: [off, calm, mild, strong, asymmetric]
 
 validation:
   minimum_thrust_to_weight_ratio: 1.5
@@ -44,5 +56,7 @@ simulation_thrust_model:
   calibrated_at_max_angular_speed_rad_s: 167.0
   design_max_total_thrust_N: 120.54
   design_thrust_to_weight_ratio: 1.5
+  hover_angular_speed_rad_s: 136.362
+  hover_rpm: 1302.238
   density_correction: none
   status: design_baseline_pending_validation

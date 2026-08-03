@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>共轴无人机控制台</title>
+    <link rel="stylesheet" href="/styles.css?v=20260804-3">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <h1>共轴无人机控制台</h1>
+          <p id="status">等待 Gazebo 数据...</p>
+        </div>
+        <div class="badge" id="connection">DISCONNECTED</div>
+      </section>
+
+      <nav class="workspace-tabs" id="workspaceTabs" aria-label="控制台工作区">
+        <button type="button" class="workspace-tab active" data-workspace-tab="flight">飞行控制</button>
+        <button type="button" class="workspace-tab" data-workspace-tab="landing">自动降落</button>
+        <button type="button" class="workspace-tab" data-workspace-tab="test">动态测试</button>
+      </nav>
+
+      <section class="flight-status-strip" data-workspace="flight" aria-label="当前控制状态">
+        <div><span>Gazebo</span><strong id="statusGazebo">等待数据</strong></div>
+        <div><span>闭环</span><strong id="statusControlSummary">已停止</strong></div>
+        <div><span>水平模式</span><strong id="statusModeSummary">--</strong></div>
+        <div><span>参数状态</span><strong id="statusUnsavedSummary">已保存</strong></div>
+      </section>
+
+      <section class="telemetry" data-workspace="flight">
+        <div class="telemetry-primary">
+          <article class="metric"><span>高度 z</span><strong id="z">--</strong><small>m</small></article>
+          <article class="metric"><span>横滚</span><strong id="roll">--</strong><small>deg</small></article>
+          <article class="metric"><span>俯仰</span><strong id="pitch">--</strong><small>deg</small></article>
+          <article class="metric"><span>偏航</span><strong id="yaw">--</strong><small>deg</small></article>
+          <article class="metric"><span>世界系速度 vx</span><strong id="velocityX">--</strong><small>m/s</small></article>
+          <article class="metric"><span>世界系速度 vy</span><strong id="velocityY">--</strong><small>m/s</small></article>
+        </div>
+        <div class="telemetry-system" aria-label="系统状态">
+          <div class="telemetry-label">系统状态</div>
+          <article><span>仿真时间</span><strong id="simTime">--</strong><small id="simClock">s</small></article>
+          <article><span>实时因子</span><strong id="rtf">--</strong><small>x</small></article>
+          <article><span>上旋翼</span><strong id="upperMotor">--</strong><small>rad/s</small></article>
+          <article><span>下旋翼</span><strong id="lowerMotor">--</strong><small>rad/s</small></article>
+          <article><span>共轴损失</span><strong id="coaxialLoss">--</strong><small>%</small></article>
+          <article><span>水面状态</span><strong id="waterContact">--</strong><small id="buoyancy">浮力 -- N</small></article>
+          <article class="system-source"><span>电机数据源</span><strong id="motorSource">--</strong><small id="motorRpm">RPM</small></article>
+        </div>
+      </section>
+
+      <section class="panels" data-workspace="flight">
+        <article class="panel flight-position-panel">
+          <h2>平面位置</h2>
+          <canvas id="xyMap" width="760" height="210"></canvas>
+        </article>
+        <article class="panel flight-attitude-panel">
+          <h2>姿态趋势</h2>
+          <canvas id="attitudeChart" width="760" height="230"></canvas>
+          <div class="chart-legend">
+            <span data-chart-series="attitudeRoll"><i class="line-roll"></i>横滚 roll</span>
+            <span data-chart-series="attitudeRollTarget"><i class="line-roll-target"></i>横滚目标</span>
+            <span data-chart-series="attitudePitch"><i class="line-pitch"></i>俯仰 pitch</span>
+            <span data-chart-series="attitudePitchTarget"><i class="line-pitch-target"></i>俯仰目标</span>
+            <span data-chart-series="attitudeYaw"><i class="line-yaw"></i>偏航 yaw</span>
+            <span data-chart-series="attitudeYawTarget"><i class="line-yaw-target"></i>偏航目标</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="landing-overview" data-workspace="landing" aria-label="自动降落飞行状态">
+        <section class="flight-status-strip" aria-label="当前控制状态">
+          <div><span>Gazebo</span><strong data-mirror-source="statusGazebo">等待数据</strong></div>
+          <div><span>闭环</span><strong data-mirror-source="statusControlSummary">已停止</strong></div>
+          <div><span>水平模式</span><strong data-mirror-source="statusModeSummary">--</strong></div>
+          <div><span>参数状态</span><strong data-mirror-source="statusUnsavedSummary">已保存</strong></div>
+        </section>
+
+        <section class="telemetry landing-telemetry">
+          <div class="telemetry-primary">
+            <article class="metric"><span>高度 z</span><strong data-mirror-source="z">--</strong><small>m</small></article>
+            <article class="metric"><span>横滚</span><strong data-mirror-source="roll">--</strong><small>deg</small></article>
+            <article class="metric"><span>俯仰</span><strong data-mirror-source="pitch">--</strong><small>deg</small></article>
+            <article class="metric"><span>偏航</span><strong data-mirror-source="yaw">--</strong><small>deg</small></article>
+            <article class="metric"><span>世界系速度 vx</span><strong data-mirror-source="velocityX">--</strong><small>m/s</small></article>
+            <article class="metric"><span>世界系速度 vy</span><strong data-mirror-source="velocityY">--</strong><small>m/s</small></article>
+          </div>
+          <div class="telemetry-system" aria-label="系统状态">
+            <div class="telemetry-label">系统状态</div>
+            <article><span>仿真时间</span><strong data-mirror-source="simTime">--</strong><small data-mirror-source="simClock">s</small></article>
+            <article><span>实时因子</span><strong data-mirror-source="rtf">--</strong><small>x</small></article>
+            <article><span>上旋翼</span><strong data-mirror-source="upperMotor">--</strong><small>rad/s</small></article>
+            <article><span>下旋翼</span><strong data-mirror-source="lowerMotor">--</strong><small>rad/s</small></article>
+            <article><span>共轴损失</span><strong data-mirror-source="coaxialLoss">--</strong><small>%</small></article>
+            <article><span>水面状态</span><strong data-mirror-source="waterContact">--</strong><small data-mirror-source="buoyancy">浮力 -- N</small></article>
+            <article class="system-source"><span>电机数据源</span><strong data-mirror-source="motorSource">--</strong><small data-mirror-source="motorRpm">RPM</small></article>
+          </div>
+        </section>
+      </section>
+
+      <section class="landing-console workspace-view" data-workspace="landing">
+        <article class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>自动水上降落</h2>
+              <p>选择落点和策略，系统自动完成定位、减速、下降与触水。</p>
+            </div>
+            <div class="controller-state" id="landingState">待命</div>
+          </div>
+          <ol class="landing-stepper" id="landingStepper" aria-label="降落阶段">
+            <li data-landing-step="locate"><span>1</span>定位</li>
+            <li data-landing-step="descent"><span>2</span>下降</li>
+            <li data-landing-step="flare"><span>3</span><b id="landingFlareStepLabel">近水缓冲</b></li>
+            <li data-landing-step="contact"><span>4</span><b id="landingContactStepLabel">触水确认</b></li>
+            <li data-landing-step="complete"><span>5</span>完成</li>
+          </ol>
+          <div class="landing-layout">
+            <aside class="landing-config">
+              <div class="parameter-frequency-heading">
+                <h3>降落任务</h3>
+                <span>开始前确认</span>
+              </div>
+              <section class="landing-config-section">
+                <h3>目标类型</h3>
+                <div class="segmented-control" id="landingTargetMode" role="group" aria-label="目标类型">
+                  <button type="button" class="active" data-target-mode="static">静态落点</button>
+                  <button type="button" data-target-mode="moving">漂移目标</button>
+                </div>
+                <input id="landing_moving_target_enabled" type="checkbox" hidden>
+                <h3 class="landing-secondary-mode-heading">承载表面</h3>
+                <div class="segmented-control" id="landingSurfaceMode" role="group" aria-label="承载表面">
+                  <button type="button" class="active" data-surface-mode="water">水面落点</button>
+                  <button type="button" data-surface-mode="platform">实体平台</button>
+                </div>
+                <input id="landing_surface_mode" type="hidden" value="water">
+              </section>
+              <section class="landing-config-section">
+                <div class="section-heading landing-target-heading">
+                  <h3 id="landingTargetPositionHeading">落点</h3>
+                  <button type="button" class="compact-command" id="useCurrentLandingPoint" disabled>使用当前位置</button>
+                </div>
+                <div class="landing-fields">
+                <label><span id="landingTargetXLabel">降落点 X m</span><input id="landing_target_x_m" type="number" step="0.1" min="-100" max="100"></label>
+                <label><span id="landingTargetYLabel">降落点 Y m</span><input id="landing_target_y_m" type="number" step="0.1" min="-100" max="100"></label>
+                <label>落地航向 deg<input id="landing_target_yaw_deg" type="number" step="1" min="-180" max="180"></label>
+                <label data-platform-surface-only hidden title="实体平台顶面相对当前水面的垂直高度">平台顶面高于水面 m<input id="landing_platform_top_offset_m" type="number" step="0.05" min="0.05" max="2"></label>
+                <label data-moving-target>目标速度 X m/s<input id="landing_target_vx_m_s" type="number" step="0.05" min="-2" max="2"></label>
+                <label data-moving-target>目标速度 Y m/s<input id="landing_target_vy_m_s" type="number" step="0.05" min="-2" max="2"></label>
+                <label data-moving-target>目标转动 deg/s<input id="landing_target_yaw_rate_deg_s" type="number" step="1" min="-57" max="57"></label>
+                </div>
+              </section>
+              <section class="landing-config-section landing-strategy-section">
+                <div class="section-heading">
+                  <h3>降落策略</h3>
+                  <span id="landingStrategyState">标准</span>
+                </div>
+                <div class="segmented-control landing-strategy-control" id="landingStrategy" role="group" aria-label="降落策略">
+                  <button type="button" data-landing-strategy="smooth">平稳</button>
+                  <button type="button" class="active" data-landing-strategy="standard">标准</button>
+                  <button type="button" data-landing-strategy="fast">快速</button>
+                </div>
+                <p class="strategy-description" id="landingStrategyDescription">平衡下降时间与触水平稳性</p>
+                <div class="landing-speed-profile" id="landingSpeedProfile">
+                  <span>进场速度</span>
+                  <strong id="landingSpeedPlan">自适应 -- m/s</strong>
+                  <small id="landingSpeedPlanDetail">远距巡航，接近落点自动减速</small>
+                </div>
+              </section>
+              <section class="landing-readiness" id="landingReadiness">
+                <div>
+                  <span>降落检查</span>
+                  <strong id="landingReadinessState">等待飞行数据</strong>
+                </div>
+                <small id="landingReadinessDetail">连接仿真后检查目标与飞行状态</small>
+              </section>
+              <details class="landing-advanced-settings">
+                <summary>高级降落设置 <span>通常无需修改</span></summary>
+                <div class="landing-advanced-body">
+                  <section>
+                    <h3>进场规划</h3>
+                    <div class="landing-fields">
+                      <label title="相对水面或甲板顶面的进场高度">表面上方进场高度 m<input id="landing_high_hover_z_m" type="number" step="0.1" min="0.8" max="5"></label>
+                      <label>近点进场速度 m/s<input id="landing_approach_speed_m_s" type="number" step="0.1" min="0.1" max="2"></label>
+                      <label>远距巡航速度 m/s<input id="landing_cruise_speed_m_s" type="number" step="0.1" min="0.5" max="3"></label>
+                      <label>位置确认半径 m<input id="landing_position_tolerance_m" type="number" step="0.01" min="0.05" max="0.5"></label>
+                      <label>航向确认误差 deg<input id="landing_yaw_tolerance_deg" type="number" step="1" min="1" max="20"></label>
+                    </div>
+                  </section>
+                  <section>
+                    <h3>下降与接触</h3>
+                    <div class="landing-fields">
+                      <label>缓速下降 m/s<input id="landing_descent_rate_m_s" type="number" step="0.05" min="0.05" max="0.8"></label>
+                      <label title="浮筒底部相对水面或甲板顶面的净空">近表面切换净空 m<input id="landing_flare_clearance_m" type="number" step="0.05" min="0.15" max="1"></label>
+                      <label>近表面下降 m/s<input id="landing_flare_rate_m_s" type="number" step="0.01" min="0.03" max="0.3"></label>
+                      <label>接触速度上限 m/s<input id="landing_touchdown_max_vz_m_s" type="number" step="0.05" min="0.05" max="0.5"></label>
+                      <label>接触确认 s<input id="landing_contact_confirm_s" type="number" step="0.1" min="0.1" max="2"></label>
+                      <label>电机退转 s<input id="landing_spool_down_s" type="number" step="0.1" min="0.3" max="5"></label>
+                    </div>
+                  </section>
+                  <section>
+                    <h3>水平规划与倾角</h3>
+                    <div class="landing-fields">
+                      <label>离水保持速度 m/s<input id="landing_departure_horizontal_speed_limit_m_s" type="number" step="0.05" min="0.05" max="1.5"></label>
+                      <label>近表面绝对速度 m/s<input id="landing_near_horizontal_speed_limit_m_s" type="number" step="0.05" min="0.05" max="1.5"></label>
+                      <label>进场制动减速度 m/s²<input id="landing_approach_braking_accel_m_s2" type="number" step="0.05" min="0.1" max="3"></label>
+                      <label>离水最大倾角 deg<input id="landing_departure_tilt_limit_deg" type="number" step="0.5" min="1" max="20"></label>
+                      <label>进场最大倾角 deg<input id="landing_approach_tilt_limit_deg" type="number" step="0.5" min="3" max="30"></label>
+                      <label>近表面最大倾角 deg<input id="landing_near_tilt_limit_deg" type="number" step="0.5" min="1" max="20"></label>
+                    </div>
+                  </section>
+                  <section>
+                    <h3>复飞保护</h3>
+                    <div class="landing-fields">
+                      <label>姿态警告角 deg<input id="landing_warning_tilt_deg" type="number" step="0.5" min="1" max="20"></label>
+                      <label>下降复飞角 deg<input id="landing_abort_tilt_deg" type="number" step="0.5" min="3" max="30"></label>
+                      <label>进场复飞角 deg<input id="landing_approach_abort_tilt_deg" type="number" step="0.5" min="5" max="35"></label>
+                      <label>位置偏差复飞 m<input id="landing_abort_position_error_m" type="number" step="0.05" min="0.1" max="2"></label>
+                      <label>近表面下降超速 m/s<input id="landing_near_max_descent_speed_m_s" type="number" step="0.05" min="0.1" max="1"></label>
+                      <label>超速判定延迟 s<input id="landing_near_overspeed_grace_s" type="number" step="0.1" min="0" max="3"></label>
+                      <label>复飞高度 m<input id="landing_go_around_height_m" type="number" step="0.1" min="0.3" max="3"></label>
+                    </div>
+                  </section>
+                  <section data-moving-target>
+                    <h3>漂移目标安全</h3>
+                    <div class="landing-fields">
+                      <label>状态超时 s<input id="landing_target_status_timeout_s" type="number" step="0.05" min="0.05" max="2"></label>
+                      <label title="漂移目标超过该速度时判定目标状态异常；不是无人机速度上限">漂移目标允许速度 m/s<input id="landing_target_speed_limit_m_s" type="number" step="0.05" min="0.05" max="2"></label>
+                      <label>跟踪修正余量 m/s<input id="landing_moving_target_correction_reserve_m_s" type="number" step="0.05" min="0.05" max="1.5"></label>
+                    </div>
+                  </section>
+                  <details class="landing-expert-settings">
+                    <summary>专家判据 <span>状态切换与触水确认</span></summary>
+                    <section>
+                      <h3>状态切换</h3>
+                      <div class="landing-fields">
+                        <label title="离水或起飞后，高度、垂直速度、水平速度和倾角连续合格达到该时长，才进入进场阶段；任一条件超限会重新计时。">离水稳定时间 s<input id="landing_departure_stable_time_s" type="number" step="0.1" min="0.1" max="3"></label>
+                        <label title="浮筒越过近表面切换高度后继续垂直离开承载面的安全余量；用于避免尚未完全离开水面或甲板就开始水平进场。">离台安全净空余量 m<input id="landing_departure_clearance_margin_m" type="number" step="0.01" min="0.02" max="0.5"></label>
+                        <label title="位置、相对水平速度、航向、相对航向角速度、高度和垂直速度连续合格达到该时长，才由对准进入高位悬停。">对准稳定时间 s<input id="landing_align_stable_time_s" type="number" step="0.1" min="0.1" max="3"></label>
+                        <label title="在目标上方的位置、速度、航向、倾角和高度连续稳定达到该时长，才开始缓速下降。">高位悬停时间 s<input id="landing_hover_stable_time_s" type="number" step="0.1" min="0.1" max="5"></label>
+                        <label title="进场结束时允许的最大水平相对速度，即 |无人机水平速度−目标水平速度|；静态目标时等于无人机水平速度。与位置、高度和垂直速度判据同时合格后进入对准。">进场相对速度 m/s<input id="landing_approach_relative_speed_tolerance_m_s" type="number" step="0.01" min="0.03" max="0.8"></label>
+                        <label title="对准阶段允许的最大水平相对速度，即 |无人机水平速度−目标水平速度|；达到该值以内不代表单独合格，还需同时满足位置、航向和高度条件。">对准相对速度 m/s<input id="landing_align_relative_speed_tolerance_m_s" type="number" step="0.01" min="0.03" max="0.5"></label>
+                        <label title="高位悬停、近表面平台接触和接触确认时允许的最大水平相对速度；数值过大会允许带速下降，过小则可能频繁重置稳定计时。">悬停相对速度 m/s<input id="landing_hover_relative_speed_tolerance_m_s" type="number" step="0.01" min="0.03" max="0.5"></label>
+                        <label title="离水稳定阶段无人机相对世界坐标系的最大绝对水平速度，不是相对漂移目标速度；用于确认起飞后没有明显侧向滑移。">离水水平速度判据 m/s<input id="landing_departure_horizontal_speed_tolerance_m_s" type="number" step="0.01" min="0.03" max="0.5"></label>
+                        <label title="当前机体高度与该阶段目标高度之间允许的最大绝对误差；用于离水稳定、进场、对准和高位悬停的状态切换。">高度误差判据 m<input id="landing_height_tolerance_m" type="number" step="0.01" min="0.05" max="0.5"></label>
+                        <label title="离水稳定和进场结束时允许的最大绝对垂直速度 |Vz|；防止无人机仍明显升降时进入下一阶段。">进场垂直速度判据 m/s<input id="landing_approach_vertical_speed_tolerance_m_s" type="number" step="0.01" min="0.03" max="0.5"></label>
+                        <label title="对准和高位悬停阶段允许的最大绝对垂直速度 |Vz|，通常应比进场垂直速度判据更严格。">精确阶段垂直速度 m/s<input id="landing_precision_vertical_speed_tolerance_m_s" type="number" step="0.01" min="0.02" max="0.3"></label>
+                        <label title="对准阶段允许的最大相对航向角速度，即 |无人机偏航角速度−目标转动速度|；静态目标时等于无人机偏航角速度绝对值。">航向角速度判据 deg/s<input id="landing_yaw_rate_tolerance_deg_s" type="number" step="0.5" min="1" max="30"></label>
+                        <label title="在设定的近表面切换净空基础上增加的提前量；浮筒底部净空低于两者之和后进入近表面缓冲。">近表面切换余量 m<input id="landing_flare_transition_margin_m" type="number" step="0.01" min="0" max="0.15"></label>
+                      </div>
+                    </section>
+                    <section>
+                      <h3>触水与稳定浮态</h3>
+                      <div class="landing-fields">
+                        <label data-water-surface-only title="单侧浮筒浸入其虚拟吃水深度的比例阈值；左右浮筒均达到该比例后才视为双侧触水。">浮筒触水比例 0-1<input id="landing_contact_submerged_fraction" type="number" step="0.005" min="0.005" max="0.3"></label>
+                        <label title="接触确认阶段允许的最大横滚或俯仰角速度；超过后认为接触姿态仍不稳定。">接触姿态角速度 deg/s<input id="landing_contact_tilt_rate_limit_deg_s" type="number" step="0.5" min="1" max="45"></label>
+                        <label title="接触暂时失效后允许等待恢复的时间；持续超过该时长会从接触确认或稳定浮态退回近表面阶段。">接触丢失容忍 s<input id="landing_contact_loss_grace_s" type="number" step="0.01" min="0" max="0.5"></label>
+                        <label title="稳定浮态阶段允许的最大横滚或俯仰角速度；用于确认机体摆动已经衰减。">浮态角速度判据 deg/s<input id="landing_settling_tilt_rate_limit_deg_s" type="number" step="0.5" min="1" max="30"></label>
+                        <label title="稳定浮态阶段允许的最大绝对垂直速度 |Vz|；与接触、倾角和姿态角速度共同决定是否可以退转。">浮态垂直速度 m/s<input id="landing_settling_vertical_speed_limit_m_s" type="number" step="0.01" min="0.02" max="0.3"></label>
+                        <label title="接触、倾角、姿态角速度和垂直速度连续合格达到该时长后，才进入电机退转；条件超限会重新计时。">浮态稳定时间 s<input id="landing_settling_time_s" type="number" step="0.1" min="0.1" max="3"></label>
+                      </div>
+                    </section>
+                    <section>
+                      <h3>复飞恢复判据</h3>
+                      <div class="landing-fields">
+                        <label title="复飞时距离目标复飞高度允许的最大不足量；高度达到目标减去该容差后才可能判定恢复完成。">恢复高度误差 m<input id="landing_go_around_height_tolerance_m" type="number" step="0.01" min="0.05" max="0.5"></label>
+                        <label title="复飞恢复完成时允许的最大绝对垂直速度 |Vz|；避免仍在快速爬升时结束复飞控制。">恢复垂直速度 m/s<input id="landing_go_around_vertical_speed_tolerance_m_s" type="number" step="0.01" min="0.03" max="0.5"></label>
+                        <label title="复飞恢复完成时允许的最大横滚或俯仰角；高度、垂直速度和倾角同时合格后任务才以中止状态结束。">恢复最大倾角 deg<input id="landing_go_around_tilt_tolerance_deg" type="number" step="0.5" min="1" max="20"></label>
+                      </div>
+                    </section>
+                  </details>
+                  <div class="buttons landing-settings-actions">
+                    <button type="button" id="saveLandingConfig" class="secondary">保存参数</button>
+                  </div>
+                </div>
+              </details>
+            </aside>
+            <section class="landing-visuals">
+              <div class="landing-plot landing-map-panel">
+                <div class="section-heading">
+                  <h3>平面轨迹</h3>
+                  <span>实际轨迹 / 目标轨迹 / 允许半径</span>
+                </div>
+                <canvas id="landingMap" width="900" height="420"></canvas>
+              </div>
+              <div class="landing-plot">
+                <h3>高度响应</h3>
+                <canvas id="landingHeightChart" width="900" height="220"></canvas>
+                <div class="chart-legend">
+                  <span><i class="line-pitch-target"></i>规划高度</span>
+                  <span><i class="line-pitch"></i>实际高度</span>
+                  <span title="浮筒最低点相对水面或甲板顶面的垂直净空；接触或浸入时按 0 显示"><i class="line-clearance"></i>浮筒底部净空</span>
+                </div>
+              </div>
+              <div class="landing-plot">
+                <h3>垂向与执行器</h3>
+                <canvas id="landingMotionChart" width="900" height="220"></canvas>
+              <div class="chart-legend">
+                <span><i class="line-roll"></i>垂向速度</span>
+                <span><i class="line-yaw"></i>电机转速比例</span>
+              </div>
+              </div>
+            </section>
+            <aside class="landing-status-column">
+              <section class="metric-group">
+                <h3>实时状态</h3>
+                <div class="landing-metric-list">
+                  <article><span title="接触或浸入承载表面时净空为 0">浮筒底部净空</span><strong id="landingClearance">--</strong><small>m</small></article>
+                  <article><span>垂向速度</span><strong id="landingVz">--</strong><small>m/s</small></article>
+                  <article><span>距落点</span><strong id="landingDistance">--</strong><small>m</small></article>
+                  <article><span>水平误差</span><strong id="landingHorizontalError">--</strong><small>m</small></article>
+                  <article><span>水平速度</span><strong id="landingHorizontalSpeed">--</strong><small>m/s</small></article>
+                  <article><span>速度上限</span><strong id="landingActiveSpeedLimit">--</strong><small>m/s</small></article>
+                  <article><span>航向误差</span><strong id="landingYawError">--</strong><small>deg</small></article>
+                  <article><span>目标状态</span><strong id="landingTargetHealth">--</strong><small id="landingTargetVelocity">m/s</small></article>
+                </div>
+              </section>
+              <section class="metric-group touchdown-group">
+                <h3 id="landingContactQualityTitle">触水质量</h3>
+                <div class="landing-metric-list">
+                  <article><span>落点误差</span><strong id="landingTouchdownError">--</strong><small>m</small></article>
+                  <article><span>相对速度</span><strong id="landingTouchdownSpeed">--</strong><small>m/s</small></article>
+                  <article><span>航向误差</span><strong id="landingTouchdownYawError">--</strong><small>deg</small></article>
+                  <article><span id="landingContactDelayLabel">双侧接触延迟</span><strong id="landingContactDelay">--</strong><small>s</small></article>
+                </div>
+              </section>
+              <section class="metric-group risk-group">
+                <h3>风险状态</h3>
+                <div class="landing-metric-list">
+                  <article><span>冲击峰值</span><strong id="landingImpact">--</strong><small>N</small></article>
+                  <article><span id="landingImmersionLabel">左右浸没率</span><strong id="landingImmersion">--</strong><small id="landingImmersionUnit">%</small></article>
+                </div>
+              </section>
+            </aside>
+          </div>
+          <div class="landing-action-bar">
+            <div class="buttons">
+              <button id="startLanding" class="primary">开始自动降落</button>
+              <button id="localLanding" class="warning" disabled>改为原地降落</button>
+            </div>
+            <button type="button" class="status-link" id="landingActionHint" disabled>参数将在任务启动时保存并冻结</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="tuner workspace-view" data-workspace="flight">
+        <article class="panel">
+          <div class="panel-title">
+            <h2>闭环调参控制台</h2>
+            <div class="controller-state" id="controllerState">STOPPED</div>
+          </div>
+          <div class="control-section-tabs" id="controlSectionTabs" role="tablist" aria-label="控制参数分类">
+            <button type="button" class="active" data-control-section-tab="basic">基本控制</button>
+            <button type="button" data-control-section-tab="pid">PID 参数</button>
+            <button type="button" data-control-section-tab="environment">仿真工况</button>
+            <button type="button" data-control-section-tab="hardware">实机因素</button>
+          </div>
+          <section class="console-section" data-control-section="basic">
+            <div class="parameter-frequency-heading">
+              <h3>目标与控制模式</h3>
+              <span>常用参数</span>
+            </div>
+          <div class="controls">
+            <label>目标高度 m<input id="target_z_m" type="number" step="0.05" min="0" max="5"></label>
+            <label data-horizontal-modes="attitude">目标横滚 deg<input id="target_roll_deg" type="number" step="0.1"></label>
+            <label data-horizontal-modes="attitude">目标俯仰 deg<input id="target_pitch_deg" type="number" step="0.1"></label>
+            <label>目标偏航 deg<input id="target_yaw_deg" type="number" step="0.1"></label>
+            <label data-horizontal-modes="velocity">目标速度 vx m/s<input id="target_vx_m_s" type="number" step="0.1"></label>
+            <label data-horizontal-modes="velocity">目标速度 vy m/s<input id="target_vy_m_s" type="number" step="0.1"></label>
+            <label data-horizontal-modes="position">目标位置 x m<input id="target_x_m" type="number" step="0.1"></label>
+            <label data-horizontal-modes="position">目标位置 y m<input id="target_y_m" type="number" step="0.1"></label>
+          </div>
+          <fieldset class="schedule-controls">
+            <legend>水平控制</legend>
+            <label>控制模式
+              <select id="horizontal_control_mode">
+                <option value="attitude">姿态</option>
+                <option value="velocity">速度</option>
+                <option value="position">位置</option>
+              </select>
+            </label>
+            <label data-horizontal-modes="velocity position">最大倾角 deg<input id="velocity_tilt_limit_deg" type="number" step="0.5" min="0" max="45"></label>
+            <label data-horizontal-modes="velocity position">最大加速度 m/s²<input id="velocity_accel_limit_m_s2" type="number" step="0.1" min="0"></label>
+            <label data-horizontal-modes="position">最大速度 m/s<input id="position_velocity_limit_m_s" type="number" step="0.1" min="0"></label>
+          </fieldset>
+          <details class="basic-low-frequency">
+            <summary>系统标定参数 <span>低频修改</span></summary>
+            <div class="controls">
+              <label>悬停参考 rad/s<input id="hover_omega_rad_s" type="number" step="0.1"></label>
+              <label>最大转速 rad/s<input id="max_omega_rad_s" type="number" step="1"></label>
+              <label>姿态目标速率限制 deg/s<input id="attitude_setpoint_rate_limit_deg_s" type="number" step="1" min="0" max="1146"></label>
+              <label>插件控制频率 Hz<input id="rate_hz" type="number" step="0.5" disabled></label>
+            </div>
+          </details>
+          </section>
+          <details class="advanced-group" data-control-section="environment">
+            <summary>近水面工况</summary>
+          <fieldset class="condition-controls">
+            <legend>近水面工况</legend>
+            <label class="toggle-control"><input id="disturbance_enabled" type="checkbox">启用经验扰动</label>
+            <label>工况预设
+              <select id="disturbance_preset">
+                <option value="off">关闭</option>
+                <option value="calm">平静水面</option>
+                <option value="mild">轻度扰动</option>
+                <option value="strong">强扰动</option>
+                <option value="asymmetric">非对称下洗</option>
+              </select>
+            </label>
+            <label>随机种子<input id="disturbance_seed" type="number" step="1" min="0"></label>
+          </fieldset>
+          </details>
+          <details class="advanced-group" data-control-section="environment">
+            <summary>共轴旋翼与浮筒水动力</summary>
+          <fieldset class="nonideal-controls">
+            <legend>共轴旋翼与浮筒水动力</legend>
+            <label class="toggle-control"><input id="rotor_interference_enabled" type="checkbox">启用共轴干扰</label>
+            <label>最大推力损失 %<input id="coaxial_max_thrust_loss_percent" type="number" step="1" min="0" max="35"></label>
+            <label>入流时间常数 s<input id="coaxial_inflow_time_constant_s" type="number" step="0.01" min="0.01"></label>
+            <label class="toggle-control"><input id="hydrodynamics_enabled" type="checkbox">启用浮筒水动力</label>
+            <label>水密度 kg/m³<input id="water_density_kg_m3" type="number" step="1" min="500" max="1300"></label>
+            <label>水面高度 z m<input id="water_level_z_m" type="number" step="0.01"></label>
+            <label>虚拟吃水 m<input id="float_virtual_draft_m" type="number" step="0.005" min="0" max="0.18"></label>
+            <label>纵向线性阻力 N/(m/s)<input id="water_linear_drag_x_n_s_m" type="number" step="1" min="0"></label>
+            <label>侧向线性阻力 N/(m/s)<input id="water_linear_drag_y_n_s_m" type="number" step="1" min="0"></label>
+            <label>垂向线性阻力 N/(m/s)<input id="water_linear_drag_z_n_s_m" type="number" step="1" min="0"></label>
+            <label>纵向二次阻力系数<input id="water_quadratic_drag_x" type="number" step="0.05" min="0" max="5"></label>
+            <label>侧向二次阻力系数<input id="water_quadratic_drag_y" type="number" step="0.05" min="0" max="5"></label>
+            <label>垂向二次阻力系数<input id="water_quadratic_drag_z" type="number" step="0.05" min="0" max="5"></label>
+            <label>水流 x m/s<input id="water_current_x_m_s" type="number" step="0.1"></label>
+            <label>水流 y m/s<input id="water_current_y_m_s" type="number" step="0.1"></label>
+            <label>水流 z m/s<input id="water_current_z_m_s" type="number" step="0.1"></label>
+            <label>入水冲击增益 N/(m/s)<input id="water_slamming_gain_n_s_m" type="number" step="5" min="0"></label>
+          </fieldset>
+          </details>
+          <details class="advanced-group" data-control-section="hardware">
+            <summary>实机非理想因素</summary>
+          <fieldset class="nonideal-controls">
+            <legend>实机非理想因素</legend>
+            <label class="toggle-control"><input id="nonidealities_enabled" type="checkbox">启用非理想模型</label>
+            <label>姿态噪声 deg<input id="attitude_noise_std_deg" type="number" step="0.01" min="0"></label>
+            <label>陀螺噪声 deg/s<input id="gyro_noise_std_deg_s" type="number" step="0.01" min="0"></label>
+            <label>姿态零偏标准差 deg<input id="attitude_bias_std_deg" type="number" step="0.01" min="0"></label>
+            <label>陀螺零偏标准差 deg/s<input id="gyro_bias_std_deg_s" type="number" step="0.01" min="0"></label>
+            <label>位置噪声 m<input id="position_noise_std_m" type="number" step="0.001" min="0"></label>
+            <label>速度噪声 m/s<input id="velocity_noise_std_m_s" type="number" step="0.005" min="0"></label>
+            <label>控制延迟 ms<input id="control_delay_ms" type="number" step="1" min="0"></label>
+            <label>电机时间常数 ms<input id="motor_time_constant_ms" type="number" step="5" min="0"></label>
+            <label>电机加速度上限 rad/s²<input id="motor_rate_limit_rad_s2" type="number" step="10" min="0"></label>
+            <label>电机效能<input id="motor_effectiveness" type="number" step="0.01" min="0.5" max="1"></label>
+            <label>随机种子<input id="nonidealities_seed" type="number" step="1" min="0"></label>
+          </fieldset>
+          </details>
+          <details class="advanced-group" data-control-section="environment">
+            <summary>气动环境与参数不确定性</summary>
+          <fieldset class="nonideal-controls">
+            <legend>气动环境与参数不确定性</legend>
+            <label class="toggle-control"><input id="aerodynamics_enabled" type="checkbox">启用气动模型</label>
+            <label>空气密度 kg/m³<input id="air_density_kg_m3" type="number" step="0.01" min="0.5" max="2"></label>
+            <label>纵向 CdA m²<input id="drag_area_x_m2" type="number" step="0.01" min="0"></label>
+            <label>侧向 CdA m²<input id="drag_area_y_m2" type="number" step="0.01" min="0"></label>
+            <label>垂向 CdA m²<input id="drag_area_z_m2" type="number" step="0.01" min="0"></label>
+            <label>横滚阻尼 Nm/(rad/s)<input id="angular_damping_roll_nm_s" type="number" step="0.01" min="0"></label>
+            <label>俯仰阻尼 Nm/(rad/s)<input id="angular_damping_pitch_nm_s" type="number" step="0.01" min="0"></label>
+            <label>偏航阻尼 Nm/(rad/s)<input id="angular_damping_yaw_nm_s" type="number" step="0.01" min="0"></label>
+            <label>世界系风速 x m/s<input id="wind_x_m_s" type="number" step="0.1"></label>
+            <label>世界系风速 y m/s<input id="wind_y_m_s" type="number" step="0.1"></label>
+            <label>世界系风速 z m/s<input id="wind_z_m_s" type="number" step="0.1"></label>
+            <label>阵风 RMS m/s<input id="gust_rms_m_s" type="number" step="0.1" min="0"></label>
+            <label>阵风相关时间 s<input id="gust_correlation_time_s" type="number" step="0.1" min="0.05"></label>
+            <label>等效质量比例<input id="mass_scale" type="number" step="0.01" min="0.7" max="1.3"></label>
+            <label>等效横滚惯量比例<input id="inertia_scale_roll" type="number" step="0.01" min="0.5" max="1.5"></label>
+            <label>等效俯仰惯量比例<input id="inertia_scale_pitch" type="number" step="0.01" min="0.5" max="1.5"></label>
+            <label>等效偏航惯量比例<input id="inertia_scale_yaw" type="number" step="0.01" min="0.5" max="1.5"></label>
+            <label>重心偏移 x m<input id="cg_offset_x_m" type="number" step="0.001" min="-0.15" max="0.15"></label>
+            <label>重心偏移 y m<input id="cg_offset_y_m" type="number" step="0.001" min="-0.15" max="0.15"></label>
+            <label>重心偏移 z m<input id="cg_offset_z_m" type="number" step="0.001" min="-0.15" max="0.15"></label>
+            <label>随机种子<input id="aerodynamics_seed" type="number" step="1" min="0"></label>
+          </fieldset>
+          </details>
+          <details class="advanced-group" data-control-section="pid">
+            <summary>偏航大信号增益调度</summary>
+          <fieldset class="schedule-controls">
+            <legend>偏航大信号增益调度</legend>
+            <label>大信号 Kp<input id="yaw_large_signal_kp" type="number" step="0.1" min="0"></label>
+            <label>大信号 Kd<input id="yaw_large_signal_kd" type="number" step="0.1" min="0"></label>
+            <label>切换起点 deg<input id="yaw_schedule_start_deg" type="number" step="0.1" min="0"></label>
+            <label>切换终点 deg<input id="yaw_schedule_end_deg" type="number" step="0.1" min="0"></label>
+          </fieldset>
+          </details>
+          <section class="console-section pid-section" data-control-section="pid">
+            <div class="section-heading">
+              <h3>PID 参数</h3>
+              <div class="tab-list" id="pidTabs" role="tablist" aria-label="PID 环路">
+                <button type="button" class="tab active" role="tab" data-pid-tab="attitude">姿态</button>
+                <button type="button" class="tab" role="tab" data-pid-tab="velocity">速度</button>
+                <button type="button" class="tab" role="tab" data-pid-tab="position">位置</button>
+              </div>
+            </div>
+          <div class="pid-grid">
+            <fieldset data-pid-group="attitude">
+              <legend>高度环</legend>
+              <label>Kp<input id="height_kp" type="number" step="0.1"></label>
+              <label>Ki<input id="height_ki" type="number" step="0.01"></label>
+              <label>Kd<input id="height_kd" type="number" step="0.1"></label>
+              <label>限幅 N<input id="height_limit" type="number" step="1"></label>
+            </fieldset>
+            <fieldset data-pid-group="attitude">
+              <legend>横滚环</legend>
+              <label>Kp<input id="roll_kp" type="number" step="0.05"></label>
+              <label>Ki<input id="roll_ki" type="number" step="0.01"></label>
+              <label>Kd<input id="roll_kd" type="number" step="0.01"></label>
+              <label>限幅 Nm<input id="roll_limit" type="number" step="0.05"></label>
+            </fieldset>
+            <fieldset data-pid-group="attitude">
+              <legend>俯仰环</legend>
+              <label>Kp<input id="pitch_kp" type="number" step="0.05"></label>
+              <label>Ki<input id="pitch_ki" type="number" step="0.01"></label>
+              <label>Kd<input id="pitch_kd" type="number" step="0.01"></label>
+              <label>限幅 Nm<input id="pitch_limit" type="number" step="0.05"></label>
+            </fieldset>
+            <fieldset data-pid-group="attitude">
+              <legend>偏航环</legend>
+              <label>Kp<input id="yaw_kp" type="number" step="0.05"></label>
+              <label>Ki<input id="yaw_ki" type="number" step="0.01"></label>
+              <label>Kd<input id="yaw_kd" type="number" step="0.01"></label>
+              <label>限幅 Nm<input id="yaw_limit" type="number" step="0.01"></label>
+            </fieldset>
+            <fieldset data-pid-group="velocity">
+              <legend>速度 vx 环</legend>
+              <label>Kp<input id="velocity_x_kp" type="number" step="0.1"></label>
+              <label>Ki<input id="velocity_x_ki" type="number" step="0.05"></label>
+              <label>加速度限幅 m/s²<input id="velocity_x_limit" type="number" step="0.1"></label>
+              <label>积分限幅 m<input id="velocity_x_integral_limit" type="number" step="0.1"></label>
+            </fieldset>
+            <fieldset data-pid-group="velocity">
+              <legend>速度 vy 环</legend>
+              <label>Kp<input id="velocity_y_kp" type="number" step="0.1"></label>
+              <label>Ki<input id="velocity_y_ki" type="number" step="0.05"></label>
+              <label>加速度限幅 m/s²<input id="velocity_y_limit" type="number" step="0.1"></label>
+              <label>积分限幅 m<input id="velocity_y_integral_limit" type="number" step="0.1"></label>
+            </fieldset>
+            <fieldset data-pid-group="position">
+              <legend>位置 x 环</legend>
+              <label>Kp<input id="position_x_kp" type="number" step="0.1"></label>
+              <label>Ki<input id="position_x_ki" type="number" step="0.05"></label>
+              <label>Kd<input id="position_x_kd" type="number" step="0.05"></label>
+              <label>速度限幅 m/s<input id="position_x_limit" type="number" step="0.1"></label>
+              <label>积分限幅 m·s<input id="position_x_integral_limit" type="number" step="0.1"></label>
+            </fieldset>
+            <fieldset data-pid-group="position">
+              <legend>位置 y 环</legend>
+              <label>Kp<input id="position_y_kp" type="number" step="0.1"></label>
+              <label>Ki<input id="position_y_ki" type="number" step="0.05"></label>
+              <label>Kd<input id="position_y_kd" type="number" step="0.05"></label>
+              <label>速度限幅 m/s<input id="position_y_limit" type="number" step="0.1"></label>
+              <label>积分限幅 m·s<input id="position_y_integral_limit" type="number" step="0.1"></label>
+            </fieldset>
+          </div>
+          </section>
+          <details class="controller-raw-output">
+            <summary>技术详情（排障时展开）</summary>
+            <pre id="controllerOutput">等待控制器输出...</pre>
+          </details>
+          <div class="buttons sticky-actions">
+            <button id="startControl" class="primary">启动闭环</button>
+            <button id="saveConfig" class="secondary">保存参数</button>
+            <button id="discardConfig" class="secondary" disabled>取消修改</button>
+            <button id="restoreDefaults" class="warning" disabled>恢复默认参数</button>
+            <button type="button" class="save-state" id="configDirty" disabled>参数已保存</button>
+            <button id="stopControl" class="danger">停止并清零</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="test-page workspace-view" id="testModal" data-workspace="test" aria-labelledby="testModalTitle">
+        <article class="test-page-panel">
+        <div class="test-page-header">
+          <div>
+            <h2 id="testModalTitle">动态性能测试</h2>
+            <p>阶跃响应、控制参数与重复性统计</p>
+          </div>
+          <div class="controller-state" id="testState">IDLE</div>
+        </div>
+        <div class="test-page-body">
+          <div class="test-workspace">
+          <aside class="test-sidebar">
+          <section class="modal-section test-primary-setup">
+            <div class="parameter-frequency-heading">
+              <h3>当前测试</h3>
+              <span>常用参数</span>
+            </div>
+            <div class="controls test-primary-controls">
+              <label>测试轴
+                <select id="test_axis">
+                  <option value="pitch">俯仰 pitch</option>
+                  <option value="roll">横滚 roll</option>
+                  <option value="yaw">偏航 yaw</option>
+                  <option value="vx">速度 vx</option>
+                  <option value="vy">速度 vy</option>
+                  <option value="x">位置 x</option>
+                  <option value="y">位置 y</option>
+                </select>
+              </label>
+              <label>阶跃幅值
+                <span class="input-with-unit">
+                  <input id="test_step" type="number" value="15" step="0.1">
+                  <span class="field-unit" id="testStepUnit">deg</span>
+                </span>
+              </label>
+              <label>重复次数<input id="test_repeat_count" type="number" step="1" min="1" max="5" value="1"></label>
+            </div>
+            <details class="test-sampling-details">
+              <summary>低频采样与时序参数</summary>
+              <div class="controls test-sampling-controls">
+                <label>基线时长 s<input id="test_baseline_s" type="number" step="0.1" value="2.0"></label>
+                <label>测试时长 s<input id="test_duration_s" type="number" step="0.5" value="5.0"></label>
+                <label>采样周期 s<input id="test_sample_period_s" type="number" value="0.003" disabled></label>
+                <label>稳定带 %<input id="test_settling_band_percent" type="number" value="2.0" disabled></label>
+              </div>
+            </details>
+          </section>
+
+          <details class="modal-advanced">
+            <summary>基线目标与控制</summary>
+          <section class="modal-section compact-section">
+            <div class="controls modal-targets">
+              <label>目标高度 m<input id="modal_target_z_m" type="number" step="0.05" min="0" max="5"></label>
+              <label data-horizontal-modes="attitude">目标横滚 deg<input id="modal_target_roll_deg" type="number" step="0.1"></label>
+              <label data-horizontal-modes="attitude">目标俯仰 deg<input id="modal_target_pitch_deg" type="number" step="0.1"></label>
+              <label>目标偏航 deg<input id="modal_target_yaw_deg" type="number" step="0.1"></label>
+              <label data-horizontal-modes="velocity">目标速度 vx m/s<input id="modal_target_vx_m_s" type="number" step="0.1"></label>
+              <label data-horizontal-modes="velocity">目标速度 vy m/s<input id="modal_target_vy_m_s" type="number" step="0.1"></label>
+              <label data-horizontal-modes="position">目标位置 x m<input id="modal_target_x_m" type="number" step="0.1"></label>
+              <label data-horizontal-modes="position">目标位置 y m<input id="modal_target_y_m" type="number" step="0.1"></label>
+            </div>
+            <input id="modal_hover_omega_rad_s" type="hidden">
+            <input id="modal_max_omega_rad_s" type="hidden">
+            <input id="modal_attitude_setpoint_rate_limit_deg_s" type="hidden">
+            <input id="modal_rate_hz" type="hidden">
+            <fieldset class="schedule-controls modal-condition-controls">
+              <legend>水平控制</legend>
+              <label>控制模式
+                <select id="modal_horizontal_control_mode" disabled>
+                  <option value="attitude">姿态</option>
+                  <option value="velocity">速度</option>
+                  <option value="position">位置</option>
+                </select>
+              </label>
+              <label data-horizontal-modes="velocity position">最大倾角 deg<input id="modal_velocity_tilt_limit_deg" type="number" step="0.5" min="0" max="45"></label>
+              <label data-horizontal-modes="velocity position">最大加速度 m/s²<input id="modal_velocity_accel_limit_m_s2" type="number" step="0.1" min="0"></label>
+              <label data-horizontal-modes="position">最大速度 m/s<input id="modal_position_velocity_limit_m_s" type="number" step="0.1" min="0"></label>
+            </fieldset>
+          </section>
+          </details>
+
+          <section class="modal-section">
+            <h3>PID 参数</h3>
+            <div class="pid-grid modal-pid-grid">
+              <fieldset data-test-pid="height">
+                <legend>高度环</legend>
+                <label>Kp<input id="modal_height_kp" type="number" step="0.1"></label>
+                <label>Ki<input id="modal_height_ki" type="number" step="0.01"></label>
+                <label>Kd<input id="modal_height_kd" type="number" step="0.1"></label>
+                <label>限幅 N<input id="modal_height_limit" type="number" step="1"></label>
+              </fieldset>
+              <fieldset data-test-pid="roll">
+                <legend>横滚环</legend>
+                <label>Kp<input id="modal_roll_kp" type="number" step="0.05"></label>
+                <label>Ki<input id="modal_roll_ki" type="number" step="0.01"></label>
+                <label>Kd<input id="modal_roll_kd" type="number" step="0.01"></label>
+                <label>限幅 Nm<input id="modal_roll_limit" type="number" step="0.05"></label>
+              </fieldset>
+              <fieldset data-test-pid="pitch">
+                <legend>俯仰环</legend>
+                <label>Kp<input id="modal_pitch_kp" type="number" step="0.05"></label>
+                <label>Ki<input id="modal_pitch_ki" type="number" step="0.01"></label>
+                <label>Kd<input id="modal_pitch_kd" type="number" step="0.01"></label>
+                <label>限幅 Nm<input id="modal_pitch_limit" type="number" step="0.05"></label>
+              </fieldset>
+              <fieldset data-test-pid="yaw">
+                <legend>偏航环</legend>
+                <label>Kp<input id="modal_yaw_kp" type="number" step="0.05"></label>
+                <label>Ki<input id="modal_yaw_ki" type="number" step="0.01"></label>
+                <label>Kd<input id="modal_yaw_kd" type="number" step="0.01"></label>
+                <label>限幅 Nm<input id="modal_yaw_limit" type="number" step="0.01"></label>
+              </fieldset>
+              <fieldset data-test-pid="velocity_x">
+                <legend>速度 vx 环</legend>
+                <label>Kp<input id="modal_velocity_x_kp" type="number" step="0.1"></label>
+                <label>Ki<input id="modal_velocity_x_ki" type="number" step="0.05"></label>
+                <label>加速度限幅 m/s²<input id="modal_velocity_x_limit" type="number" step="0.1"></label>
+                <label>积分限幅 m<input id="modal_velocity_x_integral_limit" type="number" step="0.1"></label>
+              </fieldset>
+              <fieldset data-test-pid="velocity_y">
+                <legend>速度 vy 环</legend>
+                <label>Kp<input id="modal_velocity_y_kp" type="number" step="0.1"></label>
+                <label>Ki<input id="modal_velocity_y_ki" type="number" step="0.05"></label>
+                <label>加速度限幅 m/s²<input id="modal_velocity_y_limit" type="number" step="0.1"></label>
+                <label>积分限幅 m<input id="modal_velocity_y_integral_limit" type="number" step="0.1"></label>
+              </fieldset>
+              <fieldset data-test-pid="position_x">
+                <legend>位置 x 环</legend>
+                <label>Kp<input id="modal_position_x_kp" type="number" step="0.1"></label>
+                <label>Ki<input id="modal_position_x_ki" type="number" step="0.05"></label>
+                <label>Kd<input id="modal_position_x_kd" type="number" step="0.05"></label>
+                <label>速度限幅 m/s<input id="modal_position_x_limit" type="number" step="0.1"></label>
+                <label>积分限幅 m·s<input id="modal_position_x_integral_limit" type="number" step="0.1"></label>
+              </fieldset>
+              <fieldset data-test-pid="position_y">
+                <legend>位置 y 环</legend>
+                <label>Kp<input id="modal_position_y_kp" type="number" step="0.1"></label>
+                <label>Ki<input id="modal_position_y_ki" type="number" step="0.05"></label>
+                <label>Kd<input id="modal_position_y_kd" type="number" step="0.05"></label>
+                <label>速度限幅 m/s<input id="modal_position_y_limit" type="number" step="0.1"></label>
+                <label>积分限幅 m·s<input id="modal_position_y_integral_limit" type="number" step="0.1"></label>
+              </fieldset>
+            </div>
+          </section>
+
+          <details class="modal-advanced">
+            <summary>近水面工况</summary>
+          <section class="modal-section compact-section">
+            <fieldset class="condition-controls modal-condition-controls">
+              <label class="toggle-control"><input id="modal_disturbance_enabled" type="checkbox">启用经验扰动</label>
+              <label>工况预设
+                <select id="modal_disturbance_preset">
+                  <option value="off">关闭</option>
+                  <option value="calm">平静水面</option>
+                  <option value="mild">轻度扰动</option>
+                  <option value="strong">强扰动</option>
+                  <option value="asymmetric">非对称下洗</option>
+                </select>
+              </label>
+              <label>随机种子<input id="modal_disturbance_seed" type="number" step="1" min="0"></label>
+            </fieldset>
+          </section>
+          </details>
+
+          <details class="modal-advanced">
+            <summary>共轴旋翼与浮筒水动力</summary>
+          <section class="modal-section compact-section">
+            <fieldset class="nonideal-controls modal-condition-controls">
+              <label class="toggle-control"><input id="modal_rotor_interference_enabled" type="checkbox">启用共轴干扰</label>
+              <label>最大推力损失 %<input id="modal_coaxial_max_thrust_loss_percent" type="number" step="1" min="0" max="35"></label>
+              <label>入流时间常数 s<input id="modal_coaxial_inflow_time_constant_s" type="number" step="0.01" min="0.01"></label>
+              <label class="toggle-control"><input id="modal_hydrodynamics_enabled" type="checkbox">启用浮筒水动力</label>
+              <label>水密度 kg/m³<input id="modal_water_density_kg_m3" type="number" step="1" min="500" max="1300"></label>
+              <label>水面高度 z m<input id="modal_water_level_z_m" type="number" step="0.01"></label>
+              <label>虚拟吃水 m<input id="modal_float_virtual_draft_m" type="number" step="0.005" min="0" max="0.18"></label>
+              <label>纵向线性阻力 N/(m/s)<input id="modal_water_linear_drag_x_n_s_m" type="number" step="1" min="0"></label>
+              <label>侧向线性阻力 N/(m/s)<input id="modal_water_linear_drag_y_n_s_m" type="number" step="1" min="0"></label>
+              <label>垂向线性阻力 N/(m/s)<input id="modal_water_linear_drag_z_n_s_m" type="number" step="1" min="0"></label>
+              <label>纵向二次阻力系数<input id="modal_water_quadratic_drag_x" type="number" step="0.05" min="0" max="5"></label>
+              <label>侧向二次阻力系数<input id="modal_water_quadratic_drag_y" type="number" step="0.05" min="0" max="5"></label>
+              <label>垂向二次阻力系数<input id="modal_water_quadratic_drag_z" type="number" step="0.05" min="0" max="5"></label>
+              <label>水流 x m/s<input id="modal_water_current_x_m_s" type="number" step="0.1"></label>
+              <label>水流 y m/s<input id="modal_water_current_y_m_s" type="number" step="0.1"></label>
+              <label>水流 z m/s<input id="modal_water_current_z_m_s" type="number" step="0.1"></label>
+              <label>入水冲击增益 N/(m/s)<input id="modal_water_slamming_gain_n_s_m" type="number" step="5" min="0"></label>
+            </fieldset>
+          </section>
+          </details>
+
+          <details class="modal-advanced">
+            <summary>实机非理想因素</summary>
+          <section class="modal-section compact-section">
+            <fieldset class="nonideal-controls modal-condition-controls">
+              <label class="toggle-control"><input id="modal_nonidealities_enabled" type="checkbox">启用非理想模型</label>
+              <label>姿态噪声 deg<input id="modal_attitude_noise_std_deg" type="number" step="0.01" min="0"></label>
+              <label>陀螺噪声 deg/s<input id="modal_gyro_noise_std_deg_s" type="number" step="0.01" min="0"></label>
+              <label>姿态零偏标准差 deg<input id="modal_attitude_bias_std_deg" type="number" step="0.01" min="0"></label>
+              <label>陀螺零偏标准差 deg/s<input id="modal_gyro_bias_std_deg_s" type="number" step="0.01" min="0"></label>
+              <label>位置噪声 m<input id="modal_position_noise_std_m" type="number" step="0.001" min="0"></label>
+              <label>速度噪声 m/s<input id="modal_velocity_noise_std_m_s" type="number" step="0.005" min="0"></label>
+              <label>控制延迟 ms<input id="modal_control_delay_ms" type="number" step="1" min="0"></label>
+              <label>电机时间常数 ms<input id="modal_motor_time_constant_ms" type="number" step="5" min="0"></label>
+              <label>电机加速度上限 rad/s²<input id="modal_motor_rate_limit_rad_s2" type="number" step="10" min="0"></label>
+              <label>电机效能<input id="modal_motor_effectiveness" type="number" step="0.01" min="0.5" max="1"></label>
+              <label>随机种子<input id="modal_nonidealities_seed" type="number" step="1" min="0"></label>
+            </fieldset>
+          </section>
+          </details>
+
+          <details class="modal-advanced">
+            <summary>气动环境与参数不确定性</summary>
+          <section class="modal-section compact-section">
+            <fieldset class="nonideal-controls modal-condition-controls">
+              <label class="toggle-control"><input id="modal_aerodynamics_enabled" type="checkbox">启用气动模型</label>
+              <label>空气密度 kg/m³<input id="modal_air_density_kg_m3" type="number" step="0.01" min="0.5" max="2"></label>
+              <label>纵向 CdA m²<input id="modal_drag_area_x_m2" type="number" step="0.01" min="0"></label>
+              <label>侧向 CdA m²<input id="modal_drag_area_y_m2" type="number" step="0.01" min="0"></label>
+              <label>垂向 CdA m²<input id="modal_drag_area_z_m2" type="number" step="0.01" min="0"></label>
+              <label>横滚阻尼 Nm/(rad/s)<input id="modal_angular_damping_roll_nm_s" type="number" step="0.01" min="0"></label>
+              <label>俯仰阻尼 Nm/(rad/s)<input id="modal_angular_damping_pitch_nm_s" type="number" step="0.01" min="0"></label>
+              <label>偏航阻尼 Nm/(rad/s)<input id="modal_angular_damping_yaw_nm_s" type="number" step="0.01" min="0"></label>
+              <label>世界系风速 x m/s<input id="modal_wind_x_m_s" type="number" step="0.1"></label>
+              <label>世界系风速 y m/s<input id="modal_wind_y_m_s" type="number" step="0.1"></label>
+              <label>世界系风速 z m/s<input id="modal_wind_z_m_s" type="number" step="0.1"></label>
+              <label>阵风 RMS m/s<input id="modal_gust_rms_m_s" type="number" step="0.1" min="0"></label>
+              <label>阵风相关时间 s<input id="modal_gust_correlation_time_s" type="number" step="0.1" min="0.05"></label>
+              <label>等效质量比例<input id="modal_mass_scale" type="number" step="0.01" min="0.7" max="1.3"></label>
+              <label>等效横滚惯量比例<input id="modal_inertia_scale_roll" type="number" step="0.01" min="0.5" max="1.5"></label>
+              <label>等效俯仰惯量比例<input id="modal_inertia_scale_pitch" type="number" step="0.01" min="0.5" max="1.5"></label>
+              <label>等效偏航惯量比例<input id="modal_inertia_scale_yaw" type="number" step="0.01" min="0.5" max="1.5"></label>
+              <label>重心偏移 x m<input id="modal_cg_offset_x_m" type="number" step="0.001" min="-0.15" max="0.15"></label>
+              <label>重心偏移 y m<input id="modal_cg_offset_y_m" type="number" step="0.001" min="-0.15" max="0.15"></label>
+              <label>重心偏移 z m<input id="modal_cg_offset_z_m" type="number" step="0.001" min="-0.15" max="0.15"></label>
+              <label>随机种子<input id="modal_aerodynamics_seed" type="number" step="1" min="0"></label>
+            </fieldset>
+          </section>
+          </details>
+
+          <details class="modal-advanced" id="modalYawScheduleGroup">
+            <summary>偏航大信号增益调度</summary>
+          <section class="modal-section compact-section">
+            <fieldset class="schedule-controls modal-condition-controls">
+              <label>大信号 Kp<input id="modal_yaw_large_signal_kp" type="number" step="0.1" min="0"></label>
+              <label>大信号 Kd<input id="modal_yaw_large_signal_kd" type="number" step="0.1" min="0"></label>
+              <label>切换起点 deg<input id="modal_yaw_schedule_start_deg" type="number" step="0.1" min="0"></label>
+              <label>切换终点 deg<input id="modal_yaw_schedule_end_deg" type="number" step="0.1" min="0"></label>
+            </fieldset>
+          </section>
+          </details>
+
+          </aside>
+          <section class="test-results-pane">
+          <section class="modal-section test-results">
+            <h3>测试结果</h3>
+            <div class="test-chart-grid">
+              <section class="test-position-plot">
+                <h3>平面轨迹</h3>
+                <canvas id="testPositionMap" width="420" height="320"></canvas>
+              </section>
+              <section class="test-response-plot">
+                <h3>响应曲线</h3>
+                <canvas id="testResponseChart" width="760" height="320"></canvas>
+                <div class="chart-legend">
+                  <span data-chart-series="target"><i class="line-target"></i>目标</span>
+                  <span data-chart-series="filteredTarget"><i class="line-filtered-target"></i>整形目标</span>
+                  <span data-chart-series="responseRuns"><i class="line-response-run"></i>单次响应</span>
+                  <span data-chart-series="response"><i class="line-response"></i>平均响应</span>
+                  <span data-chart-series="output"><i class="line-output"></i>控制输出</span>
+                </div>
+              </section>
+            </div>
+            <section class="test-primary-summary" aria-label="核心动态响应">
+              <article><span>超调</span><strong id="testOvershoot">--</strong><small>%</small></article>
+              <article><span>上升时间</span><strong id="testRiseTime">--</strong><small>s</small></article>
+              <article><span>稳定时间</span><strong id="testSettlingTime">--</strong><small>s</small></article>
+              <article><span>稳态误差</span><strong id="testSteadyError">--</strong><small id="testSteadyUnit">deg</small></article>
+            </section>
+            <section class="test-comparison" aria-label="与上次测试比较">
+              <div><span>上次超调</span><strong id="testPreviousOvershoot">--</strong><small id="testDeltaOvershoot">等待第二次测试</small></div>
+              <div><span>上次上升时间</span><strong id="testPreviousRiseTime">--</strong><small id="testDeltaRiseTime">等待第二次测试</small></div>
+              <div><span>上次稳定时间</span><strong id="testPreviousSettlingTime">--</strong><small id="testDeltaSettlingTime">等待第二次测试</small></div>
+              <div><span>比较状态</span><strong id="testCompareState">无基线</strong><small>同通道、同阶跃自动比较</small></div>
+            </section>
+            <details class="test-secondary-results">
+              <summary><span>更多诊断</span><small>限幅、采样质量与重复性</small></summary>
+              <div class="result-groups">
+              <section class="result-group">
+                <h4>限幅</h4>
+                <div class="limit-summary-row">
+                <section class="limit-group planning-group">
+                  <h4>规划层限幅</h4>
+                  <div class="limit-cards">
+                    <article><span>位置速度</span><strong id="testPositionSaturation">--</strong><small>%</small></article>
+                    <article><span>加速度</span><strong id="testAccelSaturation">--</strong><small>%</small></article>
+                  </div>
+                </section>
+                <section class="limit-group actuator-group">
+                  <h4>执行器层限幅</h4>
+                  <div class="limit-cards">
+                    <article><span>姿态力矩</span><strong id="testTorqueSaturation">--</strong><small>%</small></article>
+                    <article><span>电机转速</span><strong id="testMotorSaturation">--</strong><small>%</small></article>
+                  </div>
+                </section>
+              </div>
+              </section>
+              <section class="result-group">
+                <h4>采样质量</h4>
+                <div class="performance-grid">
+                  <article><span>采样数</span><strong id="testSamples">--</strong><small>pts</small></article>
+                  <article><span>实际采样率</span><strong id="testSampleRate">--</strong><small>Hz</small></article>
+                  <article><span>估算带宽</span><strong id="testBandwidth">--</strong><small>Hz</small></article>
+                  <article><span>估算相位裕度</span><strong id="testPhaseMargin">--</strong><small>deg</small></article>
+                  <article><span>估算阻尼比</span><strong id="testDampingRatio">--</strong><small>-</small></article>
+                </div>
+              </section>
+              <section class="result-group">
+                <h4>重复性</h4>
+                <div class="performance-grid">
+                  <article><span>完成次数</span><strong id="testRepeatCount">--</strong><small>runs</small></article>
+                  <article><span>上升时间标准差</span><strong id="testRiseStddev">--</strong><small>s</small></article>
+                  <article><span>超调标准差</span><strong id="testOvershootStddev">--</strong><small>%</small></article>
+                  <article><span>稳定时间标准差</span><strong id="testSettlingStddev">--</strong><small>s</small></article>
+                </div>
+              </section>
+              </div>
+            </details>
+            <details class="test-raw-output">
+              <summary>技术详情（排障时展开）</summary>
+              <pre id="testOutput">等待动态性能测试...</pre>
+            </details>
+          </section>
+          </section>
+          </div>
+        </div>
+
+        <div class="test-action-bar">
+          <span class="action-message" id="testUserMessage">选择测试通道并确认阶跃幅值</span>
+          <button id="startTest" class="primary" disabled>开始当前通道测试</button>
+          <button id="syncModalConfig" class="secondary">同步到主控制台</button>
+          <button id="stopTest" class="danger">停止测试</button>
+        </div>
+        </article>
+      </section>
+    </main>
+    <script src="/app.js?v=20260804-3"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+# Reference environment used for the validated simulation.
+os=Ubuntu 20.04 LTS
+host=WSL2 compatible; native Ubuntu 20.04 also supported
+gazebo_collection=Garden
+gz_sim=7.9.0
+gz_plugin=2.0.4
+gz_transport=12.2.2
+gz_msgs=9.5.1
+gz_rendering=7.5.0
+renderer=OGRE1 with Mesa llvmpipe fallback
+compiler=g++ 9.4.0, C++17
+python=3.8.10, standard library only

@@ -1,0 +1,262 @@
+# Phase-2 control interface baseline.
+# Roll / pitch are represented by an equivalent attitude torque actuator.
+# This is a simulation abstraction for PID development, not a real coaxial rotor model.
+control_interfaces:
+  gazebo_partition: coaxial_uav_static_water
+  plugin: plugins/CoaxialPidController.cc
+  plugin_library: build/plugins/libCoaxialPidController.so
+  plugin_config_topic: /coaxial_uav/control/config
+  plugin_status_topic: /coaxial_uav/control/status
+  motor_speed_topic: /coaxial_uav/gazebo/command/motor_speed
+  motor_speed_msg: gz.msgs.Actuators
+  attitude_wrench_topic: /world/static_water_takeoff/wrench/persistent
+  attitude_wrench_clear_topic: /world/static_water_takeoff/wrench/clear
+  attitude_wrench_msg: gz.msgs.EntityWrench
+  controlled_link: coaxial_uav::base_link
+
+nominal_values:
+  hover_motor_speed_rad_s: 136.362
+  hover_motor_speed_rpm: 1302.238
+
+virtual_attitude_actuator:
+  enabled: true
+  torque_axes: body_roll_pitch_yaw
+  roll_torque_limit_Nm: 3.0
+  pitch_torque_limit_Nm: 3.0
+  yaw_torque_limit_Nm: 0.8
+  intended_use: attitude_pid_development
+  physical_interpretation: equivalent_swashplate_or_tilt_actuation
+  validation_status: validated_in_zero_gravity_attitude_test
+  validation_case: 0.5_Nm_pitch_step
+
+attitude_pid:
+  implementation: controllers/attitude_pid.py
+  state_source_topic: /world/static_water_takeoff/pose/info
+  output_topic: /world/static_water_takeoff/wrench/persistent
+  clear_topic: /world/static_water_takeoff/wrench/clear
+  small_signal_torque_limit_Nm: 0.20
+  small_signal_yaw_torque_limit_Nm: 0.05
+  default_rate_hz: 4.0
+  default_duration_s: 3.0
+  roll:
+    kp: 0.30
+    ki: 0.0
+    kd: 0.03
+  pitch:
+    kp: 0.30
+    ki: 0.0
+    kd: 0.03
+  yaw:
+    kp: 0.10
+    ki: 0.0
+    kd: 0.01
+  validation_status: static_water_small_signal_loop_ran
+  validation_case: 0.02_rad_pitch_setpoint_0.2_Nm_limit
+  validation_note: stable_command_path_no_visible_pitch_response_under_float_contact
+
+monitoring:
+  dashboard_server: dashboard/server.py
+  launcher: scripts/run_dashboard.sh
+  default_url: http://127.0.0.1:8765
+  data_sources:
+    pose: /world/static_water_takeoff/pose/info
+    stats: /world/static_water_takeoff/stats
+    joint_state: /world/static_water_takeoff/model/coaxial_uav/joint_state
+    commanded_motor_state_fallback: data/runtime/motor_command.json
+  visual_world_markers:
+    landing_target: landing_target_visual
+    height_reference: height_reference_visual
+
+interactive_tuning:
+  implementation: dashboard/server.py
+  realtime_controller: CoaxialPidController Gazebo system plugin
+  ui: dashboard/index.html
+  endpoints:
+    snapshot: /snapshot
+    control_state: /control
+    apply_config: /control/config
+    start: /control/start
+    stop: /control/stop
+  default_targets:
+    height_m: 0.8
+    roll_rad: 0.0
+    pitch_rad: 0.0
+    yaw_rad: 0.0
+    world_x_m: 0.0
+    world_y_m: 0.0
+    world_vx_m_s: 0.0
+    world_vy_m_s: 0.0
+  horizontal_control_mode:
+    choices: [attitude, velocity, position]
+    mutually_exclusive: true
+    ui_angle_unit: deg
+    controller_internal_angle_unit: rad
+  horizontal_position_loop:
+    architecture: world_position_PD_to_velocity_PI_to_attitude
+    default_enabled: false
+    vector_velocity_limit_m_s: 2.5
+    anti_windup: conditional_integration_and_vector_saturation_rollback
+    x: {kp_per_s: 2.5, ki_per_s2: 0.0, kd: 0.95, velocity_limit_m_s: 2.5, integral_limit_m_s: 2.0}
+    y: {kp_per_s: 2.5, ki_per_s2: 0.0, kd: 0.95, velocity_limit_m_s: 2.5, integral_limit_m_s: 2.0}
+  horizontal_velocity_loop:
+    architecture: world_velocity_PI_to_yaw_compensated_roll_pitch_setpoints
+    default_enabled: false
+    target_bandwidth_Hz: 0.5_to_0.8
+    tilt_limit_deg: 15.0
+    vector_acceleration_limit_m_s2: 2.2
+    anti_windup: conditional_integration_and_vector_saturation_rollback
+    tilt_thrust_compensation: true
+    x: {kp_per_s: 2.8, ki_per_s2: 0.15, acceleration_limit_m_s2: 2.2, integral_limit_m: 1.0}
+    y: {kp_per_s: 2.8, ki_per_s2: 0.15, acceleration_limit_m_s2: 2.2, integral_limit_m: 1.0}
+  default_height_pid:
+    kp_N_per_m: 45.0
+    ki: 0.0
+    kd_N_per_m_s: 35.0
+    output_limit_N: 30.0
+  default_attitude_pid:
+    design_target: {roll_pitch_bandwidth_Hz: 5.0, yaw_small_signal_bandwidth_Hz: 5.0}
+    setpoint_rate_limit_rad_s: 0.75
+    roll: {kp: 193.3, ki: 0.0, kd: 8.61, limit_Nm: 2.5}
+    pitch: {kp: 351.3, ki: 0.0, kd: 15.65, limit_Nm: 2.7}
+    yaw: {kp: 296.1, ki: 0.0, kd: 13.19, limit_Nm: 0.7}
+    yaw_large_signal: {kp: 20.0, kd: 3.0, schedule_start_rad: 0.02, schedule_end_rad: 0.08}
+    rigid_body_inertia_kg_m2: {roll: 0.19588, pitch: 0.35588, yaw: 0.30}
+    estimated_small_signal_metrics:
+      roll: {bandwidth_Hz: 5.053, phase_margin_deg: 65.14}
+      pitch: {bandwidth_Hz: 5.052, phase_margin_deg: 65.15}
+      yaw: {bandwidth_Hz: 5.052, phase_margin_deg: 65.14}
+  validation:
+    height_case: target_z_0.8_m_15_s
+    height_result: converged_to_0.800_m_without_attitude_divergence
+    attitude_case: target_pitch_0.05_rad_8_s
+    attitude_result: pitch_converged_to_0.05_rad_with_height_near_0.798_m
+    final_attitude_case: positive_15_deg_step_at_0.75_rad_s_setpoint_rate_limit
+    final_attitude_result: all_individual_criteria_satisfied_in_unique_gazebo_partition
+    roll_case: target_roll_0.1_rad_8_s
+    roll_result: roll_converged_to_0.100000_rad_about_5.73_deg_height_near_0.791_m
+  safety:
+    max_motor_speed_rad_s: 150.0
+    stop_action: disable_plugin_control_and_zero_dashboard_command_state
+    recommended_gui: scripts/run_static_water_gui_ogre1.sh
+  limits:
+    planning:
+      position_velocity_limit_m_s: 2.5
+      velocity_acceleration_limit_m_s2: 2.2
+      velocity_tilt_limit_deg: 15.0
+    actuator:
+      motor_speed_limit_rad_s: 150.0
+      roll_torque_limit_Nm: 2.5
+      pitch_torque_limit_Nm: 2.7
+      yaw_torque_limit_Nm: 0.7
+  real_vehicle_nonidealities:
+    default_enabled: false
+    attitude_noise_std_deg: 0.02
+    gyro_noise_std_deg_s: 0.10
+    attitude_bias_std_deg: 0.05
+    gyro_bias_std_deg_s: 0.05
+    position_noise_std_m: 0.003
+    velocity_noise_std_m_s: 0.01
+    control_delay_ms: 15
+    motor_time_constant_ms: 80
+    motor_rate_limit_rad_s2: 500.0
+    motor_effectiveness: 0.98
+    deterministic_seed: 20260726
+
+dynamic_performance_test:
+  attitude_step_deg: 15.0
+  repeat_count_range: {min: 1, max: 5}
+  repeat_statistics: [mean, population_stddev, min, max]
+  telemetry_period_s: 0.003
+  required_sample_rate_Hz: 200.0
+  recorded_channels:
+    - roll_pitch_yaw_rad
+    - body_roll_pitch_yaw_rate_rad_s
+    - upper_lower_motor_speed_rad_s
+    - upper_lower_motor_speed_rpm
+    - requested_and_applied_motor_speed
+    - requested_and_applied_attitude_torque
+    - measured_and_true_pose_velocity_attitude_rate
+  saturation_reporting:
+    planning: [position_velocity, velocity_acceleration]
+    actuator: [attitude_torque, motor_speed]
+  acceptance:
+    rise_time_s: {min: 0.2, max: 0.4}
+    overshoot_percent: {max: 15.0}
+    settling_time_s: {max: 1.5, error_band_percent: 2.0}
+  velocity_step_m_s: 1.0
+  velocity_acceptance:
+    rise_time_s: {min: 0.6, max: 1.2}
+    overshoot_percent: {max: 10.0}
+    settling_time_s: {max: 3.0, error_band_percent: 5.0}
+    steady_state_error_m_s: {max_abs: 0.05}
+    sample_rate_Hz: {min: 200.0}
+  velocity_final_validation:
+    disturbance: off
+    gazebo_partition: coaxial_uav_position_tune
+    vx:
+      rise_time_s: 0.662
+      overshoot_percent: 1.067
+      settling_time_s: 1.064
+      steady_state_error_m_s: -0.00970
+      saturation_ratio: 0.05972
+      measured_sample_rate_Hz: 328.0
+      record: data/performance/dynamic_vx_20260726_195912.json
+    vy:
+      rise_time_s: 0.692
+      overshoot_percent: 1.181
+      settling_time_s: 1.089
+      steady_state_error_m_s: -0.01071
+      saturation_ratio: 0.05911
+      measured_sample_rate_Hz: 328.0
+      record: data/performance/dynamic_vy_20260726_195928.json
+  position_step_m: 2.0
+  position_acceptance:
+    rise_time_s: {max: 1.0}
+    overshoot_percent: {max: 15.0}
+    settling_time_s: {max: 3.0, error_band_percent: 5.0}
+    steady_state_error_m: {max_abs: 0.1}
+    sample_rate_Hz: {min: 200.0}
+  position_final_validation:
+    disturbance: off
+    gazebo_partition: coaxial_uav_position_tune
+    x:
+      rise_time_s: 0.991
+      overshoot_percent: 11.965
+      settling_time_s: 2.811
+      steady_state_error_m: -0.00241
+      velocity_limit_ratio: 0.16941
+      measured_sample_rate_Hz: 328.0
+      record: data/performance/dynamic_x_20260726_195055.json
+    y:
+      rise_time_s: 0.994
+      overshoot_percent: 11.834
+      settling_time_s: 2.808
+      steady_state_error_m: -0.00234
+      velocity_limit_ratio: 0.16941
+      measured_sample_rate_Hz: 328.07
+      record: data/performance/dynamic_y_20260726_195106.json
+  final_validation:
+    setpoint_rate_limit_rad_s: 0.75
+    disturbance: off
+    gazebo_partition: coaxial_uav_opt3_20260726
+    roll:
+      rise_time_s: 0.278
+      overshoot_percent: 0.851
+      settling_time_s: 0.397
+      saturation_ratio: 0.0
+      measured_sample_rate_Hz: 277.31
+      record: data/performance/dynamic_roll_20260726_165307.json
+    pitch:
+      rise_time_s: 0.270
+      overshoot_percent: 3.101
+      settling_time_s: 0.490
+      saturation_ratio: 0.0375
+      measured_sample_rate_Hz: 277.37
+      record: data/performance/dynamic_pitch_20260726_165335.json
+    yaw:
+      rise_time_s: 0.339
+      overshoot_percent: 12.874
+      settling_time_s: 1.012
+      saturation_ratio: 0.1148
+      measured_sample_rate_Hz: 256.0
+      record: data/performance/dynamic_yaw_20260726_165403.json
