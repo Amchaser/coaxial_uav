@@ -2,7 +2,7 @@
 
 日期：2026-08-05。世界 `static_water_takeoff`，分区 `coaxial_uav_static_water`。
 最终配置（height + landing，见文末参数表）在 **6 组 × 5 次 = 30 架次** 上验证，**30/30 LANDED（100%）**。
-数据落盘：`data/fv_batch/fv_<group>_NN/`（meta.json + samples.csv），指标聚合：`reports/fv_metrics.csv`。
+数据落盘：`data/fv_batch/fv_<group>_NN/`（meta.json + samples.csv），分组指标见本文档「各组结果」表格。
 
 > 方法学说明：持久 headless sim 下顺序跑批会偶发「上架次 LANDED 状态残留」导致下一架次降落监视读到陈旧
 > LANDED（`duration_s=0`、误差~7.07m 的伪成功）。为保证数据可信，本次最终验证每架次均以**全新 sim 实例**

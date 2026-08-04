@@ -157,7 +157,7 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 - **视频**（人工录制，最终参数）：`data/videos/My_videos/`
   - `静水+理想飞机模型+静态目标落点仿真视频.mp4`（68.6 MB）
   - `强扰动+非理想飞机+移动目标点降落仿真视频.mp4`（78.3 MB）
-- **数据**：`data/fv_batch/`（30 架次原始 meta.json + samples.csv）、`reports/fv_metrics.csv`（分组指标汇总）
+- **数据**：`data/fv_batch/`（30 架次原始 meta.json + samples.csv；分组指标见 `reports/final_validation.md`）
 
 ### 本阶段新增/修改文件
 
