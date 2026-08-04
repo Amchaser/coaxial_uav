@@ -1,0 +1,36 @@
+{
+  "tag": "fv_nonideal_on_03",
+  "scenario": {
+    "disturbance_preset": "off",
+    "nonidealities": true,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{\"height\":{\"kp\":90.0,\"ki\":1.0},\"landing\":{\"descent_rate_m_s\":0.3,\"touchdown_max_vz_m_s\":0.3,\"flare_clearance_m\":0.15,\"flare_rate_m_s\":0.2,\"settling_vertical_speed_limit_m_s\":0.15,\"settling_time_s\":0.35}}",
+    "seed": 20260807
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 1.193,
+    "max_abs_roll_deg": 0.2521,
+    "max_abs_pitch_deg": 0.2191,
+    "overshoot_m": 0.0,
+    "hover_error_m": -0.0459,
+    "stabilize_time_s": 2.312
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00475223,
+    "touchdown_vz_m_s": -0.206875,
+    "max_abs_roll_deg": 8.5587,
+    "max_abs_pitch_deg": 11.1818,
+    "duration_s": 12.283,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/fv_batch/fv_nonideal_on_03/samples.csv"
+}

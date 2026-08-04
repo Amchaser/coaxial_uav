@@ -1,0 +1,36 @@
+{
+  "tag": "fv_offset_3.0m_01",
+  "scenario": {
+    "disturbance_preset": "off",
+    "nonidealities": false,
+    "offset_x_m": 3.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{\"height\":{\"kp\":90.0,\"ki\":1.0},\"landing\":{\"descent_rate_m_s\":0.3,\"touchdown_max_vz_m_s\":0.3,\"flare_clearance_m\":0.15,\"flare_rate_m_s\":0.2,\"settling_vertical_speed_limit_m_s\":0.15,\"settling_time_s\":0.35}}",
+    "seed": 20260805
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 0.6639999999999997,
+    "max_abs_roll_deg": 6.9541,
+    "max_abs_pitch_deg": 12.6703,
+    "overshoot_m": 0.0,
+    "hover_error_m": -0.0346,
+    "stabilize_time_s": 1.651
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00451474,
+    "touchdown_vz_m_s": -0.0336046,
+    "max_abs_roll_deg": 9.194,
+    "max_abs_pitch_deg": 13.1465,
+    "duration_s": 18.598,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/fv_batch/fv_offset_3.0m_01/samples.csv"
+}

@@ -1,0 +1,151 @@
+(2026-08-05T01:00:34.457467293) (2026-08-05T01:00:34.457474291) [Msg] Gazebo Sim Server v7.9.0
+(2026-08-05T01:00:34.458733098) (2026-08-05T01:00:34.458736072) [Msg] Loading SDF world file[/home/cxj/coaxial_uav/worlds/static_water_takeoff_video.sdf].
+(2026-08-05T01:00:34.572814153) (2026-08-05T01:00:34.572820338) [Msg] Serving entity system service on [/entity/system/add]
+(2026-08-05T01:00:34.606735328) (2026-08-05T01:00:34.606742521) [Dbg] [Physics.cc:889] Loaded [gz::physics::dartsim::Plugin] from library [/usr/lib/x86_64-linux-gnu/gz-physics-6/engine-plugins/libgz-physics-dartsim-plugin.so]
+(2026-08-05T01:00:34.606769275) (2026-08-05T01:00:34.606770869) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::Physics] for entity [1]
+(2026-08-05T01:00:34.608469000) (2026-08-05T01:00:34.608473964) [Msg] Create service on [/world/static_water_takeoff/create]
+(2026-08-05T01:00:34.608531860) (2026-08-05T01:00:34.608534526) [Msg] Remove service on [/world/static_water_takeoff/remove]
+(2026-08-05T01:00:34.608593985) (2026-08-05T01:00:34.608596718) [Msg] Pose service on [/world/static_water_takeoff/set_pose]
+(2026-08-05T01:00:34.608635285) (2026-08-05T01:00:34.608637858) [Msg] Pose service on [/world/static_water_takeoff/set_pose_vector]
+(2026-08-05T01:00:34.608749913) (2026-08-05T01:00:34.608753072) [Msg] Light configuration service on [/world/static_water_takeoff/light_config]
+(2026-08-05T01:00:34.608874939) (2026-08-05T01:00:34.608877793) [Msg] Physics service on [/world/static_water_takeoff/set_physics]
+(2026-08-05T01:00:34.608950888) (2026-08-05T01:00:34.608954062) [Msg] SphericalCoordinates service on [/world/static_water_takeoff/set_spherical_coordinates]
+(2026-08-05T01:00:34.609032288) (2026-08-05T01:00:34.609034969) [Msg] Enable collision service on [/world/static_water_takeoff/enable_collision]
+(2026-08-05T01:00:34.609136975) (2026-08-05T01:00:34.609139578) [Msg] Disable collision service on [/world/static_water_takeoff/disable_collision]
+(2026-08-05T01:00:34.609232785) (2026-08-05T01:00:34.609235945) [Msg] Material service on [/world/static_water_takeoff/visual_config]
+(2026-08-05T01:00:34.609291469) (2026-08-05T01:00:34.609294379) [Msg] Material service on [/world/static_water_takeoff/wheel_slip]
+(2026-08-05T01:00:34.609308228) (2026-08-05T01:00:34.609309721) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::UserCommands] for entity [1]
+(2026-08-05T01:00:34.610243157) (2026-08-05T01:00:34.610247762) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::SceneBroadcaster] for entity [1]
+(2026-08-05T01:00:34.613332547) (2026-08-05T01:00:34.613337129) [Dbg] [Sensors.cc:525] Configuring Sensors system
+(2026-08-05T01:00:34.613391286) (2026-08-05T01:00:34.613393485) [Dbg] [Sensors.cc:444] SensorsPrivate::Run
+(2026-08-05T01:00:34.613473432) (2026-08-05T01:00:34.613476163) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::Sensors] for entity [1]
+(2026-08-05T01:00:34.613550766) (2026-08-05T01:00:34.613556856) [Dbg] [Sensors.cc:421] SensorsPrivate::RenderThread started
+(2026-08-05T01:00:34.613563991) (2026-08-05T01:00:34.613565455) [Dbg] [Sensors.cc:261] Waiting for init
+(2026-08-05T01:00:34.613919979) (2026-08-05T01:00:34.613923554) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::Contact] for entity [1]
+(2026-08-05T01:00:34.614425707) (2026-08-05T01:00:34.614429626) [Msg] Listening to instantaneous wrench commands in [/world/static_water_takeoff/wrench]
+(2026-08-05T01:00:34.614455002) (2026-08-05T01:00:34.614456482) [Msg] Listening to persistent wrench commands in [/world/static_water_takeoff/wrench/persistent]
+(2026-08-05T01:00:34.614486459) (2026-08-05T01:00:34.614488867) [Msg] Listening to wrench clear commands in [/world/static_water_takeoff/wrench/clear]
+(2026-08-05T01:00:34.614497390) (2026-08-05T01:00:34.614498911) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::ApplyLinkWrench] for entity [1]
+(2026-08-05T01:00:34.720974887) (2026-08-05T01:00:34.720980484) [Dbg] [SystemManager.cc:74] Loaded system [coaxial_uav::MovingLandingTarget] for entity [8]
+(2026-08-05T01:00:34.721540295) (2026-08-05T01:00:34.721550347) [Dbg] [SystemManager.cc:74] Loaded system [coaxial_uav::MovingLandingTarget] for entity [13]
+(2026-08-05T01:00:34.724870735) (2026-08-05T01:00:34.724878848) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::PosePublisher] for entity [40]
+(2026-08-05T01:00:34.725549085) (2026-08-05T01:00:34.725554823) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::JointStatePublisher] for entity [40]
+(2026-08-05T01:00:34.728688911) (2026-08-05T01:00:34.728693912) [Dbg] [SystemManager.cc:74] Loaded system [coaxial_uav::CoaxialPidController] for entity [40]
+(2026-08-05T01:00:34.730706270) (2026-08-05T01:00:34.730710701) [Dbg] [SystemManager.cc:74] Loaded system [coaxial_uav::NearSurfaceDisturbance] for entity [40]
+(2026-08-05T01:00:34.732799423) (2026-08-05T01:00:34.732805394) [Dbg] [SystemManager.cc:74] Loaded system [coaxial_uav::AerodynamicEnvironment] for entity [40]
+(2026-08-05T01:00:34.734994425) (2026-08-05T01:00:34.734999992) [Dbg] [SystemManager.cc:74] Loaded system [coaxial_uav::CoaxialWaterInteraction] for entity [40]
+(2026-08-05T01:00:34.735708667) (2026-08-05T01:00:34.735713562) [Dbg] [MulticopterMotorModel.cc:386] Listening to topic: coaxial_uav/gazebo/command/motor_speed
+(2026-08-05T01:00:34.735821490) (2026-08-05T01:00:34.735824752) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::MulticopterMotorModel] for entity [40]
+(2026-08-05T01:00:34.735992223) (2026-08-05T01:00:34.735994464) [Dbg] [MulticopterMotorModel.cc:386] Listening to topic: coaxial_uav/gazebo/command/motor_speed
+(2026-08-05T01:00:34.736024490) (2026-08-05T01:00:34.736025966) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::MulticopterMotorModel] for entity [40]
+(2026-08-05T01:00:34.774440050) (2026-08-05T01:00:34.774447220) [Msg] Camera Video recorder stats topic advertised on [recording_camera/image/stats]
+(2026-08-05T01:00:34.774488794) (2026-08-05T01:00:34.774490329) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::CameraVideoRecorder] for entity [91]
+(2026-08-05T01:00:34.776688813) (2026-08-05T01:00:34.776695472) [Msg] Loaded level [default]
+(2026-08-05T01:00:34.776709548) (2026-08-05T01:00:34.776710973) [Dbg] [ServerConfig.cc:685] Generating LogRecord SDF:
+(2026-08-05T01:00:34.776743684) (2026-08-05T01:00:34.776745685) [Dbg] [ServerConfig.cc:741] <plugin name='gz::sim::systems::LogRecord' filename='gz-sim-log-system'>
+  <record_path>/home/cxj/coaxial_uav/data/videos/final_platform/tlog</record_path>
+  <record_resources>false</record_resources>
+  <record_period>0.10000000000000001</record_period>
+</plugin>
+
+(2026-08-05T01:00:34.790209936) (2026-08-05T01:00:34.790223038) [Msg] Recording to log file [/home/cxj/coaxial_uav/data/videos/final_platform/tlog/state.tlog]
+(2026-08-05T01:00:34.790234127) (2026-08-05T01:00:34.790235623) [Dbg] [LogRecord.cc:333] Recording default topic[/tlog/sdf].
+(2026-08-05T01:00:34.790242307) (2026-08-05T01:00:34.790243740) [Dbg] [LogRecord.cc:334] Recording default topic[/world/static_water_takeoff/changed_state].
+(2026-08-05T01:00:34.812321102) (2026-08-05T01:00:34.812331118) [Dbg] [SystemManager.cc:74] Loaded system [gz::sim::systems::LogRecord] for entity [1]
+(2026-08-05T01:00:34.815379643) (2026-08-05T01:00:34.815385639) [Msg] Serving world controls on [/world/static_water_takeoff/control], [/world/static_water_takeoff/control/state] and [/world/static_water_takeoff/playback/control]
+(2026-08-05T01:00:34.815456144) (2026-08-05T01:00:34.815458677) [Msg] Serving GUI information on [/world/static_water_takeoff/gui/info]
+(2026-08-05T01:00:34.815465523) (2026-08-05T01:00:34.815466921) [Msg] World [static_water_takeoff] initialized with [1ms] physics profile.
+(2026-08-05T01:00:34.815550208) (2026-08-05T01:00:34.815552936) [Msg] Serving world SDF generation service on [/world/static_water_takeoff/generate_world_sdf]
+(2026-08-05T01:00:34.815617432) (2026-08-05T01:00:34.815620031) [Msg] Serving world names on [/gazebo/worlds]
+(2026-08-05T01:00:34.815658752) (2026-08-05T01:00:34.815661330) [Msg] Resource path add service on [/gazebo/resource_paths/add].
+(2026-08-05T01:00:34.815724579) (2026-08-05T01:00:34.815727075) [Msg] Resource path get service on [/gazebo/resource_paths/get].
+(2026-08-05T01:00:34.815771798) (2026-08-05T01:00:34.815774405) [Msg] Resource path resolve service on [/gazebo/resource_paths/resolve].
+(2026-08-05T01:00:34.815852917) (2026-08-05T01:00:34.815855517) [Msg] Resource paths published on [/gazebo/resource_paths].
+(2026-08-05T01:00:34.815991346) (2026-08-05T01:00:34.815996664) [Msg] Server control service on [/server_control].
+(2026-08-05T01:00:36.336838480) (2026-08-05T01:00:36.336847410) [Msg] Found no publishers on /stats, adding root stats topic
+(2026-08-05T01:00:36.336949463) (2026-08-05T01:00:36.336952188) [Msg] Found no publishers on /clock, adding root clock topic
+(2026-08-05T01:00:36.337094458) (2026-08-05T01:00:36.337097678) [Dbg] [SimulationRunner.cc:480] Creating PostUpdate worker threads: 8
+(2026-08-05T01:00:36.337110286) (2026-08-05T01:00:36.337111749) [Dbg] [SimulationRunner.cc:491] Creating postupdate worker thread (0)
+(2026-08-05T01:00:36.337192049) (2026-08-05T01:00:36.337194979) [Dbg] [SimulationRunner.cc:491] Creating postupdate worker thread (1)
+(2026-08-05T01:00:36.337267828) (2026-08-05T01:00:36.337270659) [Dbg] [SimulationRunner.cc:491] Creating postupdate worker thread (2)
+(2026-08-05T01:00:36.337305989) (2026-08-05T01:00:36.337308585) [Dbg] [SimulationRunner.cc:491] Creating postupdate worker thread (3)
+(2026-08-05T01:00:36.337345987) (2026-08-05T01:00:36.337348564) [Dbg] [SimulationRunner.cc:491] Creating postupdate worker thread (4)
+(2026-08-05T01:00:36.337432147) (2026-08-05T01:00:36.337439128) [Dbg] [SimulationRunner.cc:491] Creating postupdate worker thread (5)
+(2026-08-05T01:00:36.337524133) (2026-08-05T01:00:36.337526994) [Dbg] [SimulationRunner.cc:491] Creating postupdate worker thread (6)
+(2026-08-05T01:00:36.342446556) (2026-08-05T01:00:36.342459007) [Dbg] [Sensors.cc:680] Initialization needed
+(2026-08-05T01:00:36.342500728) (2026-08-05T01:00:36.342503532) [Dbg] [Sensors.cc:273] Initializing render context
+(2026-08-05T01:00:36.342545374) (2026-08-05T01:00:36.342550687) [Msg] Record video service on [recording_camera/record_video]
+(2026-08-05T01:00:36.342608444) (2026-08-05T01:00:36.342611325) [Msg] Loading plugin [gz-rendering-ogre2]
+(2026-08-05T01:00:36.343315162) (2026-08-05T01:00:36.343320694) [Msg] Serving scene information on [/world/static_water_takeoff/scene/info]
+(2026-08-05T01:00:36.343377924) (2026-08-05T01:00:36.343380569) [Msg] Serving graph information on [/world/static_water_takeoff/scene/graph]
+(2026-08-05T01:00:36.343422203) (2026-08-05T01:00:36.343424751) [Msg] Serving full state on [/world/static_water_takeoff/state]
+(2026-08-05T01:00:36.343455290) (2026-08-05T01:00:36.343457393) [Msg] Serving full state (async) on [/world/static_water_takeoff/state_async]
+(2026-08-05T01:00:36.343526431) (2026-08-05T01:00:36.343529437) [Msg] Publishing scene information on [/world/static_water_takeoff/scene/info]
+(2026-08-05T01:00:36.343654911) (2026-08-05T01:00:36.343659403) [Wrn] [Model.hh:69] Skipping serialization / deserialization for models with //pose/@relative_to attribute.
+(2026-08-05T01:00:36.343692226) (2026-08-05T01:00:36.343695938) [Msg] Publishing entity deletions on [/world/static_water_takeoff/scene/deletion]
+(2026-08-05T01:00:36.343738847) (2026-08-05T01:00:36.343741382) [Msg] Publishing state changes on [/world/static_water_takeoff/state]
+(2026-08-05T01:00:36.343783087) (2026-08-05T01:00:36.343786196) [Msg] Publishing pose messages on [/world/static_water_takeoff/pose/info]
+(2026-08-05T01:00:36.343811947) (2026-08-05T01:00:36.343813970) [Msg] Publishing dynamic pose messages on [/world/static_water_takeoff/dynamic_pose/info]
+(2026-08-05T01:00:36.344125903) (2026-08-05T01:00:36.344129882) [Dbg] [EntityComponentManager.cc:1655] Updated state thread iterators: 8 threads processing around 12 entities each.
+(2026-08-05T01:00:36.344186036) (2026-08-05T01:00:36.344190347) [Wrn] [Component.hh:144] Trying to serialize component with data type [N3sdf3v135WorldE], which doesn't have `operator<<`. Component will not be serialized.
+(2026-08-05T01:00:36.709668893) (2026-08-05T01:00:36.709672360) [Dbg] [RenderUtil.cc:2720] Create scene [scene]
+((2026-08-05T01:00:36.717437124) (2026-08-05T01:00:36.717443999) (2026-08-05T01:00:36.7174456472026-08-05T01:00:36.7174524442026-08-05T01:00:36.7174456472026-08-05T01:00:36.717452444) [Dbg] [Sensors.cc:680] Initialization needed
+) [Dbg] [Sensors.cc:293] Rendering Thread initialized
+(2026-08-05T01:00:36.779125402) (2026-08-05T01:00:36.779133821) [Dbg] [CameraSensor.cc:465] Camera images for [recording_camera::link::cam] advertised on [recording_camera/image]
+(2026-08-05T01:00:36.779241068) (2026-08-05T01:00:36.779243924) [Dbg] [CameraSensor.cc:793] Camera info for [recording_camera::link::cam] advertised on [/recording_camera/camera_info]
+(2026-08-05T01:00:36.779342010) (2026-08-05T01:00:36.779343663) [Wrn] [Ogre2Camera.cc:412] Ogre2Camera::SetVisibilityMask: Mask bits c0000000 are set but will be ignored as they conflict with the reserved bits used internally by the ogre2 backend.
+(2026-08-05T01:00:45.939254550) (2026-08-05T01:00:45.939263287) [Msg] Loading plugin [gz-rendering-ogre2]
+(2026-08-05T01:00:45.942370345) (2026-08-05T01:00:45.942375866) [Msg] Compatible SW encoder: libx264
+(2026-08-05T01:00:45.942383526) (2026-08-05T01:00:45.942384894) [Msg] Using encoder libx264
+(2026-08-05T01:00:45.942916008) (2026-08-05T01:00:45.942919026) [Msg] ffmpeg [libx264] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+
+(2026-08-05T01:00:45.944803904) (2026-08-05T01:00:45.944809786) [Msg] ffmpeg [libx264] profile High, level 2.2, 4:2:0, 8-bit
+
+(2026-08-05T01:00:45.944835853) (2026-08-05T01:00:45.944840957) [Msg] ffmpeg [libx264] 264 - core 163 r3060 5db6aa6 - H.264/MPEG-4 AVC codec - Copyleft 2003-2021 - http://www.videolan.org/x264.html - options: cabac=1 ref=5 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=8 psy=1 psy_rd=1.00:0.00 mixed_ref=1 me_range=16 chroma_me=1 trellis=2 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=-2 threads=5 lookahead_threads=1 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=1 b_pyramid=0 b_adapt=1 b_bias=0 direct=3 weightb=1 open_gop=0 weightp=2 keyint=10 keyint_min=1 scenecut=40 intra_refresh=0 rc_lookahead=10 rc=abr mbtree=1 bitrate=2000 ratetol=1.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
+
+(2026-08-05T01:00:45.944968471) (2026-08-05T01:00:45.944971851) [Msg] Start video recording on [recording_camera/record_video]. Encoding to tmp file: [91.mp4]
+(2026-08-05T01:00:45.946293894) (2026-08-05T01:00:45.946300428) [Dbg] [CameraSensor.cc:590] Enabling camera sensor: 'recording_camera::link::cam' data generation.
+(2026-08-05T01:01:36.810139544) (2026-08-05T01:01:36.810158482) [Msg] ffmpeg [libx264] frame I:61    Avg QP: 0.05  size: 13970
+
+(2026-08-05T01:01:36.810168571) (2026-08-05T01:01:36.810170678) [Msg] ffmpeg [libx264] frame P:301   Avg QP: 0.06  size:  2605
+
+(2026-08-05T01:01:36.810176280) (2026-08-05T01:01:36.810178325) [Msg] ffmpeg [libx264] frame B:241   Avg QP: 0.06  size:   195
+
+(2026-08-05T01:01:36.810184915) (2026-08-05T01:01:36.810186928) [Msg] ffmpeg [libx264] consecutive B-frames: 20.1% 79.9%
+
+(2026-08-05T01:01:36.810193607) (2026-08-05T01:01:36.810195626) [Msg] ffmpeg [libx264] mb I  I16..4: 82.4%  9.6%  8.1%
+
+(2026-08-05T01:01:36.810202563) (2026-08-05T01:01:36.810204623) [Msg] ffmpeg [libx264] mb P  I16..4:  0.1%  0.0%  0.1%  P16..4:  1.0%  0.7%  0.7%  0.0%  0.0%    skip:97.5%
+
+(2026-08-05T01:01:36.810212782) (2026-08-05T01:01:36.810214770) [Msg] ffmpeg [libx264] mb B  I16..4:  0.0%  0.0%  0.0%  B16..8:  2.9%  0.3%  0.0%  direct: 1.6%  skip:95.2%  L0:66.6% L1:31.2% BI: 2.2%
+
+(2026-08-05T01:01:36.810222577) (2026-08-05T01:01:36.810224589) [Msg] ffmpeg [libx264] final ratefactor: -19.47
+
+(2026-08-05T01:01:36.810230162) (2026-08-05T01:01:36.810232175) [Msg] ffmpeg [libx264] 8x8 transform intra:9.5% inter:2.0%
+
+(2026-08-05T01:01:36.810237539) (2026-08-05T01:01:36.810239625) [Msg] ffmpeg [libx264] direct mvs  spatial:98.8% temporal:1.2%
+
+(2026-08-05T01:01:36.810245975) (2026-08-05T01:01:36.810250658) [Msg] ffmpeg [libx264] coded y,uvDC,uvAC intra: 20.7% 31.1% 30.7% inter: 0.9% 1.2% 1.2%
+
+(2026-08-05T01:01:36.810255363) (2026-08-05T01:01:36.810256703) [Msg] ffmpeg [libx264] i16 v,h,dc,p: 74% 20%  5%  1%
+
+(2026-08-05T01:01:36.810264013) (2026-08-05T01:01:36.810265389) [Msg] ffmpeg [libx264] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu:  3% 53% 29%  0%  1%  0%  9%  0%  6%
+
+(2026-08-05T01:01:36.810270251) (2026-08-05T01:01:36.810271617) [Msg] ffmpeg [libx264] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu:  8% 49% 23%  3%  2%  2%  4%  2%  8%
+
+(2026-08-05T01:01:36.810275752) (2026-08-05T01:01:36.810277097) [Msg] ffmpeg [libx264] i8c dc,h,v,p: 70% 25%  2%  2%
+
+(2026-08-05T01:01:36.810281054) (2026-08-05T01:01:36.810282387) [Msg] ffmpeg [libx264] Weighted P-Frames: Y:0.0% UV:0.0%
+
+(2026-08-05T01:01:36.810287467) (2026-08-05T01:01:36.810288826) [Msg] ffmpeg [libx264] ref P L0: 78.1%  3.1%  8.1%  6.8%  3.4%  0.5%
+
+(2026-08-05T01:01:36.810293247) (2026-08-05T01:01:36.810294601) [Msg] ffmpeg [libx264] ref B L0: 98.5%  0.9%  0.5%  0.2%
+
+(2026-08-05T01:01:36.810298530) (2026-08-05T01:01:36.810300322) [Msg] ffmpeg [libx264] kb/s:267.95
+
+(2026-08-05T01:01:36.810996339) (2026-08-05T01:01:36.811002686) [Msg] Stop video recording on [recording_camera/record_video].
+(2026-08-05T01:01:36.811053358) (2026-08-05T01:01:36.811055061) [Msg] Saving tmp video[91.mp4] file to [/home/cxj/coaxial_uav/data/videos/final_platform/final_platform.mp4]
+(2026-08-05T01:01:38.795293503) (2026-08-05T01:01:38.795300851) [Dbg] [SignalHandler.cc:142] Received signal[15].
+(2026-08-05T01:01:38.795309164) (2026-08-05T01:01:38.795310696) [Dbg] [ServerPrivate.cc:115] Server received signal[15]
+(2026-08-05T01:01:38.795332794) (2026-08-05T01:01:38.795335278) [Dbg] [Sensors.cc:452] SensorsPrivate::Stop
+(2026-08-05T01:01:38.853662978) (2026-08-05T01:01:38.853672997) [Dbg] [Sensors.cc:438] SensorsPrivate::RenderThread stopped
