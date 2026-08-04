@@ -427,7 +427,7 @@
         <motorType>velocity</motorType>
       </plugin>
     </include>
-  
+  <!-- VIDEO_ONLY_BLOCK_BEGIN: camera recorder; do not edit beyond this marker -->
     <!-- 录像相机：固定在起降区（约 -5,-5）一侧，俯视水面着陆区 -->
     <model name="recording_camera">
       <static>true</static>
@@ -455,5 +455,6 @@
         </sensor>
       </link>
     </model>
-</world>
+  <!-- VIDEO_ONLY_BLOCK_END -->
+  </world>
 </sdf>
