@@ -1,0 +1,36 @@
+{
+  "tag": "height_ki1.0_kp90",
+  "scenario": {
+    "disturbance_preset": "off",
+    "nonidealities": false,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{\"height\": {\"ki\": 1.0, \"kp\": 90.0}}",
+    "seed": 20260804
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 0.6770000000000209,
+    "max_abs_roll_deg": 0.2265,
+    "max_abs_pitch_deg": 0.0435,
+    "overshoot_m": 0.0,
+    "hover_error_m": -0.0415,
+    "stabilize_time_s": 1.617
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00533128,
+    "touchdown_vz_m_s": -0.114435,
+    "max_abs_roll_deg": 8.668,
+    "max_abs_pitch_deg": 9.7237,
+    "duration_s": 11.715,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/batch/height_ki1.0_kp90/samples.csv"
+}
