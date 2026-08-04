@@ -76,6 +76,7 @@ def collect_timeseries(batch_dir: Path) -> dict:
 
 
 def build_landing_points(batch_dir: Path) -> list[dict]:
+    from analysis.analyze import group_key
     pts = []
     for d in sorted(batch_dir.iterdir()):
         csv_path = d / "samples.csv"
@@ -104,6 +105,7 @@ def build_landing_points(batch_dir: Path) -> list[dict]:
             "relative": has_target,
             "outcome": meta.get("outcome", "UNKNOWN"),
             "group": meta.get("scenario", {}).get("disturbance_preset", "off"),
+            "scenario_group": group_key(meta),
         }
         if "horizontal_error_m" in last:
             pt["horizontal_error_m"] = float(last["horizontal_error_m"])
@@ -153,16 +155,18 @@ def plot_landing_scatter(points: list[dict], out_png: str) -> None:
 
 
 def plot_disturbance_boxplot(points: list[dict], out_png: str) -> None:
-    if not points:
-        return  # 无数据：跳过，避免对空输入画箱线图
+    landed = [p for p in points if p.get("outcome") == "LANDED"]
+    if not landed:
+        return  # 无有效落地样本：跳过
     by_group: dict[str, list[float]] = {}
-    for p in points:
-        by_group.setdefault(p["group"], []).append(abs(p["vz"]))
+    for p in landed:
+        by_group.setdefault(p["scenario_group"], []).append(abs(p["vz"]))
     groups = sorted(by_group)
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.boxplot([by_group[g] for g in groups], tick_labels=groups)
-    ax.set_ylabel("|touchdown vz| (m/s)")
-    ax.set_title("扰动预设 vs 触水速度")
+    data = [by_group[g] for g in groups]
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.boxplot(data, tick_labels=[f"{g}\n(n={len(d)})" for g, d in zip(groups, data)])
+    ax.set_ylabel("|触水 vz| (m/s)")
+    ax.set_title("各场景组触水垂直速度分布（仅 LANDED）")
     fig.tight_layout()
     fig.savefig(out_png, dpi=150)
     plt.close(fig)

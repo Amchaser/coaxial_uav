@@ -26,7 +26,15 @@ def load_metas(batch_dir: Path) -> list[dict]:
 
 def group_key(meta: dict) -> str:
     s = meta.get("scenario", {})
-    if meta.get("tag", "").startswith("baseline"):
+    tag = meta.get("tag", "")
+    if tag.startswith("fv_"):
+        word = tag[len("fv_"):].split("_")[0]
+        mapping = {"baseline": "baseline", "strong": "dist_strong",
+                   "asymmetric": "dist_asymmetric", "nonideal": "nonideal",
+                   "offset": "offset_3.0m", "platform": "platform"}
+        if word in mapping:
+            return mapping[word]
+    if tag.startswith("baseline"):
         return "baseline"
     if s.get("platform_vx_m_s", 0.0) != 0.0:
         return "platform"
