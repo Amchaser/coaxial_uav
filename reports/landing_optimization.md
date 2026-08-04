@@ -156,4 +156,4 @@ LANDED，duration 11.06s，touchdown_vz -0.035，h_err 0.0036（触地 vz 与 Ta
   `final2_strong_s*`、`final2_asym_s*`、`platform_final2`（最终配置，fr=0.2），以及中间证据
   `final_strong_r1/r2/r3`、`final_strong_s*`、`final_asym_s*`、`final_baseline_off`、
   `platform_final`（fr=0.25 中间配置）。
-- 本结论：`data/report/landing_optimization.md`。
+- 本结论：`reports/landing_optimization.md`。

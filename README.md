@@ -152,12 +152,12 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 
 ### 交付物清单（供实验报告与 PPT 参考）
 
-- **实验报告**：`data/report/experiment_report.md`（完整实习报告）、`final_validation.md`（验收表）、`takeoff_optimization.md`、`landing_optimization.md`、`baseline_notes.md`
+- **实验报告**：`reports/experiment_report.md`（完整实习报告）、`reports/final_validation.md`（验收表）、`reports/takeoff_optimization.md`、`reports/landing_optimization.md`
 - **图表**：`data/report/` 下 `success_rate.png`、`landing_scatter.png`、`touchdown_safety.png`、`disturbance_boxplot.png`、`timeseries_fv_baseline_00.png`、`timeseries_fv_dist_strong_00.png`
 - **视频**（人工录制，最终参数）：`data/videos/My_videos/`
   - `静水+理想飞机模型+静态目标落点仿真视频.mp4`（68.6 MB）
   - `强扰动+非理想飞机+移动目标点降落仿真视频.mp4`（78.3 MB）
-- **数据**：`data/fv_batch/`（30 架次原始 meta.json + samples.csv）、`data/report/fv_metrics.csv`（分组指标汇总）
+- **数据**：`data/fv_batch/`（30 架次原始 meta.json + samples.csv）、`reports/fv_metrics.csv`（分组指标汇总）
 
 ### 本阶段新增/修改文件
 
