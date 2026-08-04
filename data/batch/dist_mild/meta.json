@@ -1,0 +1,36 @@
+{
+  "tag": "dist_mild",
+  "scenario": {
+    "disturbance_preset": "mild",
+    "nonidealities": false,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{}",
+    "seed": 20260804
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 0.9809999999999945,
+    "max_abs_roll_deg": 0.0911,
+    "max_abs_pitch_deg": 0.2141,
+    "overshoot_m": 0.0,
+    "hover_error_m": -0.0718,
+    "stabilize_time_s": 2.477
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00373231,
+    "touchdown_vz_m_s": -0.0391767,
+    "max_abs_roll_deg": 8.5784,
+    "max_abs_pitch_deg": 9.787,
+    "duration_s": 12.014,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/batch/dist_mild/samples.csv"
+}

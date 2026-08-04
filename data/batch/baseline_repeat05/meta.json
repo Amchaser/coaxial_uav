@@ -1,0 +1,36 @@
+{
+  "tag": "baseline_repeat05",
+  "scenario": {
+    "disturbance_preset": "off",
+    "nonidealities": false,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{}",
+    "seed": 20260804
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 1.0840000000000032,
+    "max_abs_roll_deg": 0.0328,
+    "max_abs_pitch_deg": 0.1453,
+    "overshoot_m": 0.0,
+    "hover_error_m": -0.0741,
+    "stabilize_time_s": 2.717
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00251361,
+    "touchdown_vz_m_s": -0.039024,
+    "max_abs_roll_deg": 8.6566,
+    "max_abs_pitch_deg": 9.8451,
+    "duration_s": 11.367,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/batch/baseline_repeat05/samples.csv"
+}

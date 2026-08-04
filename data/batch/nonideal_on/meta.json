@@ -1,0 +1,28 @@
+{
+  "tag": "nonideal_on",
+  "scenario": {
+    "disturbance_preset": "off",
+    "nonidealities": true,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{}",
+    "seed": 20260804
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "TAKEOFF_TIMEOUT",
+  "reason": "not stabilized within 30.0s (target_z=0.8, eps=0.08)",
+  "takeoff": {
+    "t_liftoff_s": 1.8629999999999995,
+    "max_abs_roll_deg": 0.2752,
+    "max_abs_pitch_deg": 0.2742,
+    "overshoot_m": 0.0,
+    "hover_error_m": null,
+    "stabilize_time_s": 16.262
+  }
+}

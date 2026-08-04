@@ -1,0 +1,110 @@
+{
+  "total": 21,
+  "results": [
+    {
+      "tag": "baseline_repeat00",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat01",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat02",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat03",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat04",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat05",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat06",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat07",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat08",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "baseline_repeat09",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "dist_off",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "dist_calm",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "dist_mild",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "dist_strong",
+      "returncode": 0,
+      "outcome": "TIMEOUT"
+    },
+    {
+      "tag": "dist_asymmetric",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "offset_0.0m",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "offset_1.0m",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "offset_2.0m",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "offset_3.0m",
+      "returncode": 0,
+      "outcome": "LANDED"
+    },
+    {
+      "tag": "nonideal_on",
+      "returncode": 3,
+      "outcome": "TAKEOFF_TIMEOUT"
+    },
+    {
+      "tag": "platform_0.3ms",
+      "returncode": 0,
+      "outcome": "LANDED"
+    }
+  ]
+}
