@@ -1,0 +1,30 @@
+{
+  "tag": "dist_calm",
+  "scenario": {
+    "disturbance_preset": "calm",
+    "nonidealities": false,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{}",
+    "seed": 20260804
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 3.9383046540006035,
+    "max_abs_roll_deg": 0.051,
+    "max_abs_pitch_deg": 0.0693,
+    "overshoot_m": 0.0,
+    "stabilize_time_s": 5.569
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00390699,
+    "touchdown_vz_m_s": -0.0426656,
+    "max_abs_roll_deg": 8.2183,
+    "max_abs_pitch_deg": 8.2124,
+    "duration_s": 20.978,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/batch/dist_calm/samples.csv"
+}

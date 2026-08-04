@@ -1,0 +1,30 @@
+{
+  "tag": "dist_mild",
+  "scenario": {
+    "disturbance_preset": "mild",
+    "nonidealities": false,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{}",
+    "seed": 20260804
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 3.810857043001306,
+    "max_abs_roll_deg": 0.0902,
+    "max_abs_pitch_deg": 0.083,
+    "overshoot_m": 0.0,
+    "stabilize_time_s": 5.532
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00391978,
+    "touchdown_vz_m_s": -0.0394195,
+    "max_abs_roll_deg": 8.4827,
+    "max_abs_pitch_deg": 7.8696,
+    "duration_s": 21.989,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/batch/dist_mild/samples.csv"
+}
