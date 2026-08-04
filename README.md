@@ -92,6 +92,9 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 - `scripts/batch_runner.py`：按场景矩阵批量跑起降，产物写入 `data/batch/<tag>/`（meta.json + samples.csv）。
 - `analysis/analyze.py`：批量结果聚合统计。
 - `analysis/plot_report.py`：报告图表（6 类图），写入 `data/charts/`。
+- `scripts/run_one_flight.py`：单次起降全流程（起飞→悬停→降落→落盘），`--config-json` 可传任意嵌套参数覆盖，是批跑与参数扫描的单架次内核。
+- `scripts/reset_pose.py`：运行时搬移模型位姿（初始偏移/场景复位）。
+- `scripts/batch_scan.py`：headless 参数扫描（每参数组合独立启动仿真），用于 PID/降落参数网格搜索。
 
 ### 视频录制：record_flight.sh
 
@@ -114,6 +117,12 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
   ```
 
   在 GUI 右下角打开 VideoRecorder 录像按钮，选择 mp4/ogv 保存即可（或使用记录快捷键）。
+
+### 已知限制与使用提醒
+
+- **连续飞行状态残留（FSM 残态）**：降落状态机在一次真实 LANDED 后不会自动重置，同一仿真会话内连续多次降落时，后续架次可能读到陈旧 LANDED（假成功）。批量测试需要可靠的多架次数据时，建议**每架次用全新仿真实例**（`batch_scan.py` 已按此隔离），或重启仿真/插件状态。
+- **分区一致性**：工具与 `run_static_water.sh` 默认分区 `coaxial_uav_static_water`；`run_static_water_gui_ogre1/2.sh` 默认 `coaxial_uav_gui`。用 GUI 脚本启动仿真后跑批，需给批跑脚本 `--partition` 保持一致，否则连不上仿真。
+- **视频来源**：`record_flight.sh` 自动录制输出 mp4 + tlog；报告采用的人工录制视频位于 `data/videos/My_videos/`（无 tlog）。
 
 
 ## 项目进展：起降控制优化与最终验证（2026-08-05）
