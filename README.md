@@ -87,6 +87,30 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 
 该项目用于仿真研究和控制算法验证。将参数迁移到真实飞行器前，仍需依据实际质量、惯量、执行器能力和传感器特性重新辨识，并逐级完成台架与受控飞行测试。
 
-## 第二阶段：批量测试与图表
+## 第二阶段：批量测试、图表与视频录制
 
-> 章节占位，内容将在第二阶段工具链各任务完成后补充。
+- `scripts/batch_runner.py`：按场景矩阵批量跑起降，产物写入 `data/batch/<tag>/`（meta.json + samples.csv）。
+- `scripts/analyze.py`：批量结果聚合统计。
+- `scripts/plot_report.py`：报告图表（6 类图），写入 `data/report/`。
+
+### 视频录制：record_flight.sh
+
+一键录制一次起降全程，输出 mp4 视频 + tlog 日志：
+
+```bash
+./scripts/record_flight.sh --tag dist_strong --disturbance-preset strong
+```
+
+- **产物**：`data/videos/<tag>/<tag>.mp4`（视频）与 `data/videos/<tag>/tlog/`（tlog，SQLite 格式）。
+- **原理**：Garden 7.9 不支持 `gz sim --record-video`。世界 `worlds/static_water_takeoff_video.sdf`（基础世界 + 固定录像相机 `recording_camera`）挂了 `gz-sim-camera-video-recorder-system`；脚本在飞行前/后用 `gz service` 发送 `VideoRecord` 开始/停止请求，录像相机在渲染线程逐帧编码成 H.264(mp4)；`gz sim --record --record-period 0.1` 同步记录 tlog。
+- **说明**：
+  - 录制需要 GPU/渲染线程，仿真以 GUI 模式运行（会弹出 Gazebo 窗口），不用 `--headless-rendering`（对复杂世界会挂起）。
+  - 相机位置/分辨率可在 `static_water_takeoff_video.sdf` 的 `recording_camera` 模型中调整。
+  - 脚本收尾只杀自己用分区 `coaxial_uav_video` 启动的 gz 进程，不影响其它分区的仿真。
+- **GUI 兜底**：若未自动生成 mp4，可手动渲染 tlog：
+
+  ```bash
+  gz sim --playback data/videos/<tag>/tlog
+  ```
+
+  在 GUI 右下角打开 VideoRecorder 录像按钮，选择 mp4/ogv 保存即可（或使用记录快捷键）。
