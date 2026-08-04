@@ -1,0 +1,36 @@
+{
+  "tag": "l12_scan_kp_90.0_ki_1.0_descent_rate_m_s_0.7_touchdown_max_vz_m_s_0.3",
+  "scenario": {
+    "disturbance_preset": "off",
+    "nonidealities": false,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{\"height\": {\"kp\": 90.0, \"ki\": 1.0}, \"landing\": {\"descent_rate_m_s\": 0.7, \"touchdown_max_vz_m_s\": 0.3}}",
+    "seed": 20260804
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 0.6829999999999998,
+    "max_abs_roll_deg": 0.0815,
+    "max_abs_pitch_deg": 0.0541,
+    "overshoot_m": 0.0,
+    "hover_error_m": -0.0336,
+    "stabilize_time_s": 1.645
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00370839,
+    "touchdown_vz_m_s": -0.114588,
+    "max_abs_roll_deg": 8.6252,
+    "max_abs_pitch_deg": 9.8326,
+    "duration_s": 11.678,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/batch/l12_scan_kp_90.0_ki_1.0_descent_rate_m_s_0.7_touchdown_max_vz_m_s_0.3/samples.csv"
+}

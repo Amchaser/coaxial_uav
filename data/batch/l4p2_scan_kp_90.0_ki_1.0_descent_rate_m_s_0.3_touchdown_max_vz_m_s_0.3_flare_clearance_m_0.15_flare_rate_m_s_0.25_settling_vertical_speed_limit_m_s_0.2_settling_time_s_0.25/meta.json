@@ -1,0 +1,36 @@
+{
+  "tag": "l4p2_scan_kp_90.0_ki_1.0_descent_rate_m_s_0.3_touchdown_max_vz_m_s_0.3_flare_clearance_m_0.15_flare_rate_m_s_0.25_settling_vertical_speed_limit_m_s_0.2_settling_time_s_0.25",
+  "scenario": {
+    "disturbance_preset": "strong",
+    "nonidealities": false,
+    "offset_x_m": 0.0,
+    "offset_y_m": 0.0,
+    "target_z_m": 0.8,
+    "platform_vx_m_s": 0.0,
+    "config_json": "{\"height\": {\"kp\": 90.0, \"ki\": 1.0}, \"landing\": {\"descent_rate_m_s\": 0.3, \"touchdown_max_vz_m_s\": 0.3, \"flare_clearance_m\": 0.15, \"flare_rate_m_s\": 0.25, \"settling_vertical_speed_limit_m_s\": 0.2, \"settling_time_s\": 0.25}}",
+    "seed": 20260812
+  },
+  "landing_config": {
+    "moving_target_enabled": false,
+    "target_vx_m_s": 0.0,
+    "target_vy_m_s": 0.0
+  },
+  "outcome": "LANDED",
+  "takeoff": {
+    "t_liftoff_s": 0.6189999999999998,
+    "max_abs_roll_deg": 0.0929,
+    "max_abs_pitch_deg": 0.0714,
+    "overshoot_m": 0.0,
+    "hover_error_m": -0.0428,
+    "stabilize_time_s": 1.542
+  },
+  "landing": {
+    "final_horizontal_error_m": 0.00321686,
+    "touchdown_vz_m_s": -0.0504914,
+    "max_abs_roll_deg": 8.5855,
+    "max_abs_pitch_deg": 9.8348,
+    "duration_s": 11.368,
+    "abort_reason": ""
+  },
+  "samples_csv": "data/batch/l4p2_scan_kp_90.0_ki_1.0_descent_rate_m_s_0.3_touchdown_max_vz_m_s_0.3_flare_clearance_m_0.15_flare_rate_m_s_0.25_settling_vertical_speed_limit_m_s_0.2_settling_time_s_0.25/samples.csv"
+}
