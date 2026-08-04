@@ -69,9 +69,13 @@
 `success_rate.png`、`landing_scatter.png`（落点分布 vs 0.3m 验收圈）、`touchdown_safety.png`（vz vs 偏差 vs 0.35 边界）、
 `disturbance_boxplot.png`、`timeseries_fv_baseline_00.png`、`timeseries_fv_dist_strong_00.png`。
 
-### 4.4 视频（data/videos/）
+### 4.4 视频（data/videos/My_videos/，人工录制，最终参数）
 
-`final_baseline/final_baseline.mp4`、`final_strong/final_strong.mp4`、`final_platform/final_platform.mp4`（含 tlog 可回放）。
+| 场景 | 文件 | 大小 |
+|---|---|---|
+| 静水 + 理想模型 + 静态目标 | `静水+理想飞机模型+静态目标落点仿真视频.mp4` | 68.6 MB |
+| 强扰动 + 非理想 + 移动目标 | `强扰动+非理想飞机+移动目标点降落仿真视频.mp4` | 78.3 MB |
+
 
 ## 5. 最终参数配置
 

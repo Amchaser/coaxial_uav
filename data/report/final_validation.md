@@ -48,9 +48,9 @@
 
 | 场景 | 文件 | 大小 | 内容 |
 |---|---|---|---|
-| 标况基线 | `final_baseline/final_baseline.mp4` | 1.55 MB | 标况起飞→悬停→定点降落 |
-| 强扰动 | `final_strong/final_strong.mp4` | 1.97 MB | strong 扰动下起飞→悬停→降落 |
-| 移动平台 | `final_platform/final_platform.mp4` | 1.69 MB | 0.3 m/s 移动平台跟随降落 |
+| 静水+理想+静态目标 | `My_videos/静水+理想飞机模型+静态目标落点仿真视频.mp4` | 68.6 MB | 标况起飞→悬停→定点降落（人工录制，最终参数） |
+| 强扰动+非理想+移动目标 | `My_videos/强扰动+非理想飞机+移动目标点降落仿真视频.mp4` | 78.3 MB | strong 扰动 + 非理想 + 0.3 m/s 移动目标跟随降落（人工录制，最终参数） |
+
 
 各目录含 `tlog/`（gz sim `--record` 状态记录，可 `gz sim --playback` 回放）。
 
