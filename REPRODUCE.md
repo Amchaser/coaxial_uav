@@ -38,7 +38,7 @@ scripts/run_static_water_gui_ogre1.sh
 scripts/run_dashboard.sh
 ```
 
-控制台默认地址为 `http://127.0.0.1:8765`。如果端口已被占用，服务会打印实际地址。
+控制台默认地址为 `http://127.0.0.1:5223`。如果端口已被占用，服务会打印实际地址。
 
 Gazebo 启动脚本会写入当前 `GZ_PARTITION`，控制台会自动读取，无需手工配置。
 

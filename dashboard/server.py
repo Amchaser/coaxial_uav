@@ -3337,7 +3337,7 @@ class DashboardServer(ThreadingHTTPServer):
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Serve a browser dashboard for Gazebo UAV state.")
     parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--port", type=int, default=5223)
     parser.add_argument("--no-auto-port", action="store_true", help="fail instead of trying the next port when busy")
     parser.add_argument("--partition", default=active_partition())
     parser.add_argument("--world", default="static_water_takeoff")
