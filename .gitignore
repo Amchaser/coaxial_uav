@@ -33,7 +33,7 @@ __pycache__/
 !/data/
 /data/*
 !/data/batch/
-!/data/report/
+!/data/charts/
 
 # Subagent-driven development 过程文件（不入库）
 .superpowers/

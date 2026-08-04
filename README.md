@@ -91,7 +91,7 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 
 - `scripts/batch_runner.py`：按场景矩阵批量跑起降，产物写入 `data/batch/<tag>/`（meta.json + samples.csv）。
 - `analysis/analyze.py`：批量结果聚合统计。
-- `analysis/plot_report.py`：报告图表（6 类图），写入 `data/report/`。
+- `analysis/plot_report.py`：报告图表（6 类图），写入 `data/charts/`。
 
 ### 视频录制：record_flight.sh
 
@@ -153,7 +153,7 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 ### 交付物清单（供实验报告与 PPT 参考）
 
 - **实验报告**：`reports/experiment_report.md`（完整实习报告）、`reports/final_validation.md`（验收表）、`reports/takeoff_optimization.md`、`reports/landing_optimization.md`
-- **图表**：`data/report/` 下 `success_rate.png`、`landing_scatter.png`、`touchdown_safety.png`、`disturbance_boxplot.png`、`timeseries_fv_baseline_00.png`、`timeseries_fv_dist_strong_00.png`
+- **图表**：`data/charts/` 下 `success_rate.png`、`landing_scatter.png`、`touchdown_safety.png`、`disturbance_boxplot.png`、`timeseries_fv_baseline_00.png`、`timeseries_fv_dist_strong_00.png`
 - **视频**（人工录制，最终参数）：`data/videos/My_videos/`
   - `静水+理想飞机模型+静态目标落点仿真视频.mp4`（68.6 MB）
   - `强扰动+非理想飞机+移动目标点降落仿真视频.mp4`（78.3 MB）
@@ -164,5 +164,5 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 - **新增工具链**：`scripts/reset_pose.py`、`scripts/run_one_flight.py`、`scripts/batch_runner.py`、`scripts/batch_scan.py`、`scripts/record_flight.sh`、`analysis/analyze.py`、`analysis/plot_report.py`、`worlds/static_water_takeoff_video.sdf`
 - **新增测试**：`tests/`（48 个单元测试）
 - **修改配置**：`config/tuning_defaults.json`（控制台默认预设更新为最终调优参数）
-- **新增数据/成果**：`data/fv_batch/`、`data/report/`、`data/videos/`
+- **新增数据/成果**：`data/fv_batch/`、`data/charts/`、`data/videos/`
 - **说明**：`data/batch/` 为 Task 11-13 历史批量数据（混合配置）；干净的最终验证数据以 `data/fv_batch/` 为准

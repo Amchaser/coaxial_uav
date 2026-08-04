@@ -64,7 +64,7 @@
 
 \* offset_3.0m 起飞姿态来自 3m 水平归位机动（非垂直起飞），属预期行为。
 
-### 4.3 图表（data/report/）
+### 4.3 图表（data/charts/）
 
 `success_rate.png`、`landing_scatter.png`（落点分布 vs 0.3m 验收圈）、`touchdown_safety.png`（vz vs 偏差 vs 0.35 边界）、
 `disturbance_boxplot.png`、`timeseries_fv_baseline_00.png`、`timeseries_fv_dist_strong_00.png`。
