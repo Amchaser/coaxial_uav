@@ -50,6 +50,23 @@ def expand_grid(grid: dict) -> list[tuple[str, dict]]:
     return combos
 
 
+def decide_result(tag: str, returncode: int, stdout: str) -> dict:
+    """Decide the recorded result entry for one scanned combo.
+
+    A nonzero exit code is never recorded as success: the outcome is forced to
+    "FAILED" even if the flight still emitted a meta JSON line. The meta's own
+    outcome (or PARSE_FAIL) is kept visible via ``reported_outcome``.
+    """
+    try:
+        meta = json.loads(stdout.strip().splitlines()[-1])
+        reported = meta.get("outcome")
+    except Exception:
+        reported = "PARSE_FAIL"
+    if returncode != 0:
+        return {"tag": tag, "rc": returncode, "outcome": "FAILED", "reported_outcome": reported}
+    return {"tag": tag, "rc": 0, "outcome": reported}
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description="Headless PID/landing parameter scan.")
     p.add_argument("--grid", required=True, help="JSON dict, e.g. '{\"height.kp\":[45.0,60.0]}'")
@@ -84,13 +101,9 @@ def main() -> int:
             if args.run_one_args:
                 cmd += args.run_one_args.split()
             proc = subprocess.run(cmd, capture_output=True, text=True)
-            try:
-                meta = json.loads(proc.stdout.strip().splitlines()[-1])
-                outcome = meta.get("outcome")
-            except Exception:
-                outcome = "PARSE_FAIL"
-            summary["results"].append({"tag": full_tag, "outcome": outcome})
-            print(f"  -> {outcome}", flush=True)
+            result = decide_result(full_tag, proc.returncode, proc.stdout)
+            summary["results"].append(result)
+            print(f"  -> {result['outcome']}", flush=True)
         finally:
             gz.terminate()
             try:
