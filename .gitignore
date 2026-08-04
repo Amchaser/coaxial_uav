@@ -28,3 +28,9 @@ __pycache__/
 *.log
 *.tmp
 *~
+
+# 批量测试产物（实验报告素材，需入库）
+!/data/
+/data/*
+!/data/batch/
+!/data/report/
