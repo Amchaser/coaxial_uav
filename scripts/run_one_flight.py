@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
 import sys
@@ -21,7 +22,9 @@ from dashboard.server import (  # noqa: E402
 
 BATCH_DIR = PROJECT_ROOT / "data" / "batch"
 INITIAL_Z_M = 0.34
-STABILIZED_EPS_M = 0.05
+# 高度环为纯 PD（ki=0），悬停存在约 0.05m 稳态偏差；
+# 0.05 的判定带过于苛刻会导致 TAKEOFF_TIMEOUT，放宽到 0.08。
+STABILIZED_EPS_M = 0.08
 STABILIZED_COUNT = 5
 LANDED_STATES = {"LANDED", "ABORTED"}
 
@@ -101,3 +104,162 @@ def takeoff_summary(acc: dict) -> dict:
         "overshoot_m": round(max(0.0, acc.get("max_z_m", 0.0) - target), 4),
         "stabilize_time_s": acc.get("stabilize_s"),
     }
+
+
+def landing_row(st: dict, status: dict | None, t: float) -> dict:
+    att = st.get("attitude", {})
+    motors = st.get("motors", {})
+    stats = st.get("stats", {})
+    status = status or {}
+    return {
+        "t_s": round(t, 3),
+        "sim_time_s": float(stats.get("sim_time_s", 0.0)),
+        "state": str(status.get("landing_state", "UNKNOWN")),
+        "z_m": float(st["position"]["z"]),
+        "x_m": float(st["position"].get("x", 0.0)),
+        "y_m": float(st["position"].get("y", 0.0)),
+        "roll_deg": round(float(att.get("roll_rad", 0.0)) * 57.29578, 4),
+        "pitch_deg": round(float(att.get("pitch_rad", 0.0)) * 57.29578, 4),
+        "yaw_deg": round(float(att.get("yaw_rad", 0.0)) * 57.29578, 4),
+        "upper_rad_s": float(motors.get("upper_rad_s", 0.0)),
+        "lower_rad_s": float(motors.get("lower_rad_s", 0.0)),
+        "horizontal_error_m": float(status.get("landing_horizontal_error_m", -1.0)),
+        "touchdown_vz_m_s": float(status.get("landing_touchdown_vz_m_s", 0.0)),
+        "abort_reason": str(status.get("landing_abort_reason", "")),
+        "disturbance_active": bool(status.get("disturbance_active", False)),
+        "buoyancy_n": float(status.get("buoyancy_compensation_n", 0.0)),
+        "slamming_force_n": float(status.get("slamming_force_n", 0.0)),
+    }
+
+
+def wait_stabilized(controller, args, target_z) -> bool:
+    ok = 0
+    t0 = time.monotonic()
+    while time.monotonic() - t0 < args.stabilize_timeout:
+        st = sample_state(args.partition, args.world, args.model)
+        z = float(st["position"]["z"])
+        if abs(z - target_z) < STABILIZED_EPS_M:
+            ok += 1
+            if ok >= STABILIZED_COUNT:
+                return True
+        else:
+            ok = 0
+        time.sleep(args.sample_period)
+    return False
+
+
+def monitor_landing(controller, args) -> list[dict]:
+    rows: list[dict] = []
+    t0 = time.monotonic()
+    while time.monotonic() - t0 < args.landing_timeout:
+        st = sample_state(args.partition, args.world, args.model)
+        status = read_plugin_status(args.partition, args.model)
+        row = landing_row(st, status, t=time.monotonic() - t0)
+        rows.append(row)
+        if row["state"] in LANDED_STATES:
+            break
+        time.sleep(args.sample_period)
+    return rows
+
+
+def main() -> int:
+    args = parse_args()
+    out_dir = Path(args.out_dir) / args.tag
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    from scripts.reset_pose import reset_pose  # 延迟 import，避免循环
+
+    controller = GazeboPluginController(args.partition, args.world, args.model)
+    controller.update_config(build_config(args), persist=False)
+
+    # 1) 位姿重置到 (target + offset)，落水稳定
+    rp = reset_pose(args.partition, args.world, args.model,
+                    x=args.target_x + args.offset_x,
+                    y=args.target_y + args.offset_y,
+                    z=INITIAL_Z_M)
+    if not rp["ok"]:
+        print(json.dumps({"outcome": "RESET_FAILED", "message": rp["message"]}))
+        controller.close()
+        return 2
+    time.sleep(args.settle_delay)
+
+    # 2) 起飞：start → 采样起飞指标 → 等稳定
+    takeoff_acc = {"target_z_m": args.target_z, "t_liftoff_s": None}
+    prev = {"z": float(sample_state(args.partition, args.world, args.model)["position"]["z"])}
+    controller.start()
+    t0 = time.monotonic()
+    stabilized = False
+    while time.monotonic() - t0 < args.stabilize_timeout:
+        st = sample_state(args.partition, args.world, args.model)
+        z = float(st["position"]["z"])
+        att = st.get("attitude", {})
+        record_takeoff({"z": z, "roll": att.get("roll_rad", 0.0), "pitch": att.get("pitch_rad", 0.0)},
+                       prev, t=time.monotonic() - t0, acc=takeoff_acc)
+        prev = {"z": z, "roll": att.get("roll_rad", 0.0), "pitch": att.get("pitch_rad", 0.0)}
+        if abs(z - args.target_z) < STABILIZED_EPS_M:
+            stabilized = True
+            break
+        time.sleep(args.sample_period)
+    takeoff_acc["stabilize_s"] = round(time.monotonic() - t0, 3)
+    if not stabilized:
+        controller.stop()
+        print(json.dumps({"outcome": "TAKEOFF_TIMEOUT"}))
+        controller.close()
+        return 3
+
+    # 3) 降落：start_landing → 监测到 LANDED/ABORTED/超时
+    controller.start_landing()
+    rows = monitor_landing(controller, args)
+    controller.stop()
+    last = rows[-1] if rows else {}
+    outcome = "TIMEOUT"
+    if rows and last["state"] == "LANDED":
+        outcome = "LANDED"
+    elif rows and last["state"] == "ABORTED":
+        outcome = "ABORTED"
+
+    # 4) 落盘
+    fields = ["t_s", "sim_time_s", "state", "z_m", "x_m", "y_m", "roll_deg",
+              "pitch_deg", "yaw_deg", "upper_rad_s", "lower_rad_s",
+              "horizontal_error_m", "touchdown_vz_m_s", "abort_reason",
+              "disturbance_active", "buoyancy_n", "slamming_force_n"]
+    csv_path = out_dir / "samples.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+    takeoff = takeoff_summary(takeoff_acc)
+    meta = {
+        "tag": args.tag,
+        "scenario": {
+            "disturbance_preset": args.disturbance_preset,
+            "nonidealities": bool(args.nonidealities),
+            "offset_x_m": args.offset_x,
+            "offset_y_m": args.offset_y,
+            "target_z_m": args.target_z,
+            "platform_vx_m_s": args.platform_vx,
+            "config_json": args.config_json,
+            "seed": args.seed,
+        },
+        "outcome": outcome,
+        "takeoff": takeoff,
+        "landing": {
+            "final_horizontal_error_m": float(last.get("horizontal_error_m", -1.0)),
+            "touchdown_vz_m_s": float(last.get("touchdown_vz_m_s", 0.0)),
+            "max_abs_roll_deg": round(max((abs(float(r["roll_deg"])) for r in rows), default=0.0), 4),
+            "max_abs_pitch_deg": round(max((abs(float(r["pitch_deg"])) for r in rows), default=0.0), 4),
+            "duration_s": round(rows[-1]["t_s"] - rows[0]["t_s"], 3) if len(rows) > 1 else 0.0,
+            "abort_reason": str(last.get("abort_reason", "")),
+        },
+        "samples_csv": str(csv_path.relative_to(PROJECT_ROOT)),
+    }
+    meta_path = out_dir / "meta.json"
+    meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(json.dumps(meta))
+    controller.close()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

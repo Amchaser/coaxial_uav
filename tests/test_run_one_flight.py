@@ -61,3 +61,27 @@ def test_takeoff_summary_overshoot():
     assert s["overshoot_m"] == 0.1
     assert s["t_liftoff_s"] == 2.0
     assert s["stabilize_time_s"] == 5.5
+
+
+from scripts.run_one_flight import deep_merge, landing_row
+
+
+def test_deep_merge_nested():
+    base = {"height": {"kp": 45.0, "kd": 35.0}, "z": 0.8}
+    extra = {"height": {"kp": 60.0}, "q": 1}
+    out = deep_merge(base, extra)
+    assert out["height"] == {"kp": 60.0, "kd": 35.0}
+    assert out["q"] == 1
+
+
+def test_landing_row_fields():
+    st = {"position": {"z": 0.30}, "attitude": {"roll_rad": 0.01, "pitch_rad": -0.02, "yaw_rad": 0.0},
+          "motors": {"upper_rad_s": 100.0, "lower_rad_s": 90.0},
+          "stats": {"sim_time_s": 10.0}}
+    status = {"landing_state": "SLOW_DESCENT", "landing_horizontal_error_m": 0.2,
+              "landing_touchdown_vz_m_s": -0.1}
+    row = landing_row(st, status, t=1.0)
+    assert row["state"] == "SLOW_DESCENT"
+    assert row["z_m"] == 0.30
+    assert row["horizontal_error_m"] == 0.2
+    assert row["touchdown_vz_m_s"] == -0.1
