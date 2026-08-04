@@ -114,3 +114,55 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
   ```
 
   在 GUI 右下角打开 VideoRecorder 录像按钮，选择 mp4/ogv 保存即可（或使用记录快捷键）。
+
+
+## 项目进展：起降控制优化与最终验证（2026-08-05）
+
+在第二阶段工具链基础上完成起飞/降落参数优化与全流程验证（Task 11 基线 → Task 12 高度环 → Task 13 降落 → Task 14 最终验证）。
+
+### 优化历程与关键发现
+
+| 阶段 | 问题 | 根因/发现 | 解决 |
+|---|---|---|---|
+| 基线批量 | 悬停下垂 -0.073m；dist_strong 降落超时；nonideal_on 起飞超时 | 高度环纯 PD（ki=0）；强扰动下波浪摆动破坏 SETTLING 判定窗；非理想性下 30s 稳定窗不足 | 见下两行 |
+| 高度环优化 | 悬停下垂超 ±5cm 验收 | kp 是主要杠杆（下垂∝1/kp）；ki 受 integral_limit=0.5 钳制、早窗作用小 | kp 45→90、ki 0→1.0，下垂收敛 -0.041m |
+| 降落优化 | dist_strong 无法确认 LANDED | CONTACT_CONFIRM→SETTLING→NEAR_WATER 循环，波浪浮沉破坏 0.5s/0.08m/s 稳定窗 | 调 flare+settling 参数，4/4 种子稳定 LANDED |
+| 非理想复测 | nonideal_on 起飞超时 | 纯 PD 悬停均值贴近判定带下沿，叠加噪声/延迟越界 | kp=90 后 1~2s 稳定并正常降落 |
+
+### 最终参数（已写入控制台默认预设 `config/tuning_defaults.json`）
+
+```json
+{"height":{"kp":90.0,"ki":1.0},
+ "landing":{"descent_rate_m_s":0.3,"touchdown_max_vz_m_s":0.3,"flare_clearance_m":0.15,
+            "flare_rate_m_s":0.2,"settling_vertical_speed_limit_m_s":0.15,"settling_time_s":0.35}}
+```
+
+### 最终验证结果（6 组 × 5 架次 = 30，全部 LANDED）
+
+| 组 | 成功率 | 触水 vz (m/s) | 落点偏差 (m) | 悬停误差 (m) |
+|---|---|---|---|---|
+| 标况 | 100% | -0.035 | 0.0036 | -0.033 |
+| strong 扰动 | 100% | -0.015 | 0.0030 | -0.041 |
+| asymmetric 扰动 | 100% | -0.043 | 0.0037 | -0.044 |
+| 非理想性 | 100% | -0.221 | 0.0036 | -0.045 |
+| 3m 偏移 | 100% | -0.034 | 0.0045 | -0.035 |
+| 移动平台 0.3m/s | 100% | +0.024 | 0.147 | -0.032 |
+
+**验收结论**：起飞成功率 100%、起飞姿态 <1°（标况）、悬停 ±5cm、落点偏差 <0.3m、触水 vz <0.35m/s、侧翻率 0 —— 全部达标。
+
+### 交付物清单（供实验报告与 PPT 参考）
+
+- **实验报告**：`data/report/experiment_report.md`（完整实习报告）、`final_validation.md`（验收表）、`takeoff_optimization.md`、`landing_optimization.md`、`baseline_notes.md`
+- **图表**：`data/report/` 下 `success_rate.png`、`landing_scatter.png`、`touchdown_safety.png`、`disturbance_boxplot.png`、`timeseries_fv_baseline_00.png`、`timeseries_fv_dist_strong_00.png`
+- **视频**（人工录制，最终参数）：`data/videos/My_videos/`
+  - `静水+理想飞机模型+静态目标落点仿真视频.mp4`（68.6 MB）
+  - `强扰动+非理想飞机+移动目标点降落仿真视频.mp4`（78.3 MB）
+- **数据**：`data/fv_batch/`（30 架次原始 meta.json + samples.csv）、`data/report/fv_metrics.csv`（分组指标汇总）
+
+### 本阶段新增/修改文件
+
+- **新增工具链**：`scripts/reset_pose.py`、`scripts/run_one_flight.py`、`scripts/batch_runner.py`、`scripts/batch_scan.py`、`scripts/record_flight.sh`、`analysis/analyze.py`、`analysis/plot_report.py`、`worlds/static_water_takeoff_video.sdf`
+- **新增测试**：`tests/`（48 个单元测试）
+- **修改配置**：`config/tuning_defaults.json`（控制台默认预设更新为最终调优参数）
+- **新增数据/成果**：`data/fv_batch/`、`data/report/`、`data/videos/`
+- **说明**：`data/batch/` 为 Task 11-13 历史批量数据（混合配置）；干净的最终验证数据以 `data/fv_batch/` 为准
