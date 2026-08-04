@@ -15,7 +15,7 @@
 | 环节 | 工具 | 说明 |
 |---|---|---|
 | 物理引擎 | Gazebo Garden 7.9（headless `gz sim -s -r`） | 世界 `static_water_takeoff.sdf`，水面/浮筒/空气动力/近地扰动/移动平台插件 |
-| 控制器 | 自研 `CoaxialPidController` 插件（高度/姿态/位置环，发布式调参） | 高度环 PD+I、定点降落分段状态机（CLIMB→APPROACH→ALIGN→…→SETTLING→SPOOL_DOWN→LANDED） |
+| 控制器 | 自研 `CoaxialPidController` 插件（高度/姿态/位置环，发布式调参） | 高度环 PD+I、定点降落分段状态机（高位悬停 HIGH_HOVER → 缓速降高 SLOW_DESCENT → 近水缓冲 NEAR_WATER → 着水确认 SETTLING/CONTACT_CONFIRM → 熄火 SPOOL_DOWN → LANDED，含水平归位 ALIGN/APPROACH 与 GO_AROUND/ABORTED 保护） |
 | 扰动模型 | `NearSurfaceDisturbance`（off/calm/mild/strong/asymmetric 预设） | 强扰动含阵风与水面效应用扰动 |
 | 非理想性 | 传感器噪声/姿态偏差/控制延迟/电机时间常数/推力偏差 | 开关式（`--nonidealities`） |
 | 移动平台 | `MovingLandingTarget`，vx=0.3 m/s | 动态目标跟随降落 |
@@ -45,7 +45,7 @@
 |---|---|---|---|
 | 0.8m 悬停误差 | **-0.073 m**（纯 PD 下垂，不达标） | -0.0415 m（kp=90/ki=1.0） | **-0.032 ~ -0.045 m ✅** |
 | 起飞稳定时间 | ~2.7 s | 1.62 s | **1.5 ~ 1.7 s** |
-| dist_strong 降落 | **TIMEOUT**（CONTACT_CONFIRM/NEAR_WATER 振荡 ~20s） | LANDED（flare 参数修复） | **5/5 LANDED，vz -0.015 m/s ✅** |
+| dist_strong 降落 | **TIMEOUT**（CONTACT_CONFIRM/NEAR_WATER 振荡 ~20s） | LANDED（flare + settling 参数修复） | **5/5 LANDED，vz -0.015 m/s ✅** |
 | nonideal_on 起飞 | **TAKEOFF_TIMEOUT**（30s 无法稳定） | kp90/ki1.0 后稳定 | **5/5 LANDED，vz -0.221 m/s ✅** |
 | platform 落点偏差 | 0.19 m | 0.151 m | **0.147 m ✅** |
 | 起飞最大姿态（标况） | ~0.05° | ~0.08° | **roll 0.08°/pitch 0.05° ✅** |
@@ -89,7 +89,7 @@
 
 **结论**：
 1. 最终配置下 6 组共 30 架次全部成功降落（100%），起飞成功率、悬停精度、落点偏差、触水垂速、侧翻率全部满足验收准则。
-2. 高度环加入积分（ki=1.0）将悬停下垂从 -0.073m 收敛到 -0.033m；降落拉平/沉降参数修复了强扰动下无法确认 LANDED 的问题；非理想性场景由起飞超时修复为稳定起飞降落。
+2. 高度环增益优化（主要提高 kp 45→90，辅以积分 ki 0→1.0）将悬停下垂从 -0.073m 收敛到 -0.033m；降落拉平（flare）与着水沉降（settling）参数修复了强扰动下无法确认 LANDED 的问题；非理想性场景由起飞超时修复为稳定起飞降落。
 3. 移动平台 0.3 m/s 动态跟随落点偏差 0.147 m、触水 vz +0.024 m/s，具备动态目标着水能力。
 4. 侧翻率 0，触水最大 |vz| = -0.221 m/s（非理想组），全部低于 0.35 m/s 安全边界，说明触水保护与着水沉降逻辑可靠。
 

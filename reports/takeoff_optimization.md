@@ -6,7 +6,7 @@
 
 ## 扫描方法与路径
 
-- **batch_scan.py 实测路径不可用（已定位根因，未修改生产代码）**：`batch_scan.py` 每个组合用
+- **batch_scan.py 实测路径当时不可用（已定位根因）；后续已在修复提交中解决**（为 `gz sim` 加 `-r`，见仓库历史 `fix: batch_scan 启动仿真加 -r`）：`batch_scan.py` 每个组合用
   `gz sim -s <world>`（**缺 `-r`**）启动独立分区 sim，而 `gz sim` 缺 `-r` 时服务端**保持暂停**
   （`gz sim --help` 明确 `-r  Run simulation on start`）。实测 `/clock` 在无 `-r` 时 `real {} / sim {}`
   恒为空（sim 时间不前进），有 `-r` 时正常前进。`GazeboPluginController` 只发 config/motor 话题、
@@ -75,13 +75,13 @@
 ±0.08m 判定带下沿，叠加非理想噪声/延迟后在带内外摆动，5 次连续带内永不达成；kp 提高到 90 后
 悬停均值抬到 ~0.76m+，噪声摆动不再越界，1~2s 即稳定，并正常降落（落点水平误差 ~4.6mm）。
 
-## Task 13 交接（降落运行是否需要携带本高度配置）
+## Task 13 交接（降落运行携带本高度配置，已执行）
 
-**需要**。理由：
+**需要**，且已按此执行。理由：
 - 选定高度环（kp=90, ki=1.0）在理想与非理想下均显著改善悬停精度，且对降落无副作用——
   降落阶段监控数据显示最终落点水平误差 ~2.6mm（理想）/ ~4.6mm（非理想），触水 vz、姿态均达标，
   与基线 kp=45 的降落表现相当或更优。
 - 降落序列包含 high_hover → approach 等悬停环节，更高的悬停精度降低进场起始误差，
   有利于 landing 状态机通过 height_tolerance 等检查。
 - 若 Task 13 需对比“原配置 vs 优化配置”的降落表现，请用 `--config-json '{"height":{"kp":90.0,"ki":1.0}}'`
-  传入（`persist=False`，不会污染 data/runtime/tuning_config.json，本次已确认持久化文件未被改动）。
+  传入（`persist=False`）。注：Task 13 完成后，最终参数已按需求写入 `config/tuning_defaults.json` 与 `data/runtime/tuning_config.json`（控制台默认预设）。

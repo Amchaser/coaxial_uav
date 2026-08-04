@@ -7,7 +7,7 @@
 2. 在标况下确认/微调下降剖面（低速冲击、低误差、合理时长）。
 3. 移动平台定点误差对比基线（0.19m）。
 
-**结论：dist_strong 从「必 TIMEOUT」修复为 4/4 种子稳定 LANDED；标况 touchdown vz 保持在基线水平（约 -0.035）；移动平台定点误差 0.19m → 0.151m。**
+**结论：dist_strong 从「必 TIMEOUT」修复为 4/4 种子稳定 LANDED；标况 touchdown vz 保持在基线水平（约 -0.035）；移动平台定点误差 0.19m → 0.151m（Task 13 复验值；Task 14 最终验证 5 架次均值 0.147m，见 final_validation.md）。**
 
 ## 确认的降落参数键（whitelist + sanitize 范围）
 
