@@ -2,38 +2,86 @@
 
 基于 Gazebo Garden 的共轴无人机水上起降仿真与浏览器控制台。项目包含姿态、速度、位置闭环，动态性能测试，以及面向静态或移动承载面的分段自动降落。
 
-## 环境
+> 本项目支持 **Windows 一键启动**（桌面 `.bat` 启动器）与 **GPU 硬件加速渲染**，详见下文「快速开始」与「渲染引擎」。
 
-- Ubuntu 20.04（原生或 WSL2）
+## 环境要求
+
+- 系统：Ubuntu 20.04 / 22.04（原生或 WSL2）。Windows 用户推荐 WSL2 + Windows Terminal。
 - Gazebo Garden / `gz-sim 7`
 - Python 3.8+
 - 支持 C++17 的 `g++`
 
-已经验证过的精确依赖版本见 [`config/environment.lock`](config/environment.lock)。
+已验证的精确依赖版本见 [`config/environment.lock`](config/environment.lock)。
 
 ## 快速开始
 
-首次安装依赖并编译：
+### 方式一：Windows 一键启动（推荐）
+
+前置条件：已安装 WSL2 + Ubuntu，项目位于 WSL 家目录 `~/coaxial_uav`，并已完成首次安装（见下文「首次安装」）。
+
+1. 双击 `scripts/launchers/` 下的 **`启动仿真.bat`**（建议复制到桌面方便双击）：
+   - 自动打开一个 Windows Terminal 窗口，两个标签页：`Gazebo`（仿真）与 `Dashboard`（网页控制台）。
+   - 自动在浏览器打开控制台：http://127.0.0.1:5223
+2. 双击 **`停止仿真.bat`**：一键停止所有相关进程，避免后台残留占用 CPU。
+
+> ⚠️ `.bat` 内的 WSL 发行版名（`Ubuntu-22.04`）与项目路径（`/home/cxj/coaxial_uav`）是**机器相关**的，换机器、换用户名或换发行版时需对应修改。
+
+### 方式二：手动终端启动
+
+终端 1 —— 启动 Gazebo 仿真（GPU 加速版）：
 
 ```bash
-./scripts/install_ubuntu20_garden.sh
+./scripts/run_static_water_gui_ogre2.sh
 ```
 
-终端 1 启动 Gazebo 图形界面：
-
-```bash
-./scripts/run_static_water_gui_ogre1.sh
-```
-
-终端 2 启动控制台：
+终端 2 —— 启动网页控制台：
 
 ```bash
 ./scripts/run_dashboard.sh
 ```
 
-然后打开终端中显示的本地控制台地址。干净克隆会使用 `config/tuning_defaults.json` 中随版本发布的调参结果；个人运行数据、测试曲线和构建产物不会提交到仓库。
+浏览器打开 **http://127.0.0.1:5223** 即可使用控制台。
 
-完整安装步骤、WSL2 图形界面说明和故障排查见 [`REPRODUCE.md`](REPRODUCE.md)。
+停止仿真：运行 `./scripts/stop_all.sh`，或在终端里直接 Ctrl+C。
+
+## 渲染引擎：GPU 加速 vs 软件渲染
+
+项目提供两个 Gazebo 启动脚本，用法完全相同，按需选择：
+
+| 脚本 | 渲染方式 | 适用场景 |
+|------|----------|----------|
+| `run_static_water_gui_ogre2.sh` | OGRE2 + d3d12 **硬件加速** | WSLg 下可用 RTX 等独立显卡，画面流畅（**推荐**） |
+| `run_static_water_gui_ogre1.sh` | OGRE1 + llvmpipe **软件渲染** | 无 GPU，或 OGRE2 出现黑屏 / 贴图异常时使用（兼容性最好） |
+
+切换方法：替换命令里的脚本名即可。桌面「启动仿真.bat」默认使用 GPU 版（ogre2）；如需切回软件版，把 `.bat` 里对应位置的脚本名改成 `run_static_water_gui_ogre1.sh`。
+
+> 判断当前渲染器：查看日志 `~/.gz/auto_default.log` 中的 `Loading plugin [gz-rendering-ogre2]`（GPU）或 `[gz-rendering-ogre1]`（软件）。
+
+## 首次安装（一次性）
+
+- **Ubuntu 20.04**：直接运行 `./scripts/install_ubuntu20_garden.sh`。
+- **Ubuntu 22.04**：官方脚本仅支持 20.04，请手动添加 OSRF 源并安装 Gazebo Garden：
+
+```bash
+sudo apt-get update && sudo apt-get install -y build-essential curl gnupg libgl1-mesa-dri lsb-release mesa-utils pkg-config python3
+sudo install -d -m 0755 /usr/share/keyrings
+sudo curl -fsSL https://packages.osrfoundation.org/gazebo.gpg -o /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
+```
+
+安装完成后验证环境并编译插件：
+
+```bash
+./scripts/check_environment.sh   # 应输出 Environment check passed.
+./scripts/build_plugins.sh
+```
+
+## 网页控制台
+
+- 默认地址：http://127.0.0.1:5223
+- 端口可在 `dashboard/server.py` 的 `--port` 参数修改（多人共用同一环境时建议各自改端口，避免冲突）。
+- 控制台功能：姿态 / 速度 / 位置闭环控制、动态性能测试、静态或移动承载面的分段自动降落，以及各项实时状态显示。
 
 ## 说明
 
