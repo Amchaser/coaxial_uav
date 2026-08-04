@@ -90,8 +90,8 @@ sudo apt-get update && sudo apt-get install -y gz-garden libgz-rendering7-ogre1
 ## 第二阶段：批量测试、图表与视频录制
 
 - `scripts/batch_runner.py`：按场景矩阵批量跑起降，产物写入 `data/batch/<tag>/`（meta.json + samples.csv）。
-- `scripts/analyze.py`：批量结果聚合统计。
-- `scripts/plot_report.py`：报告图表（6 类图），写入 `data/report/`。
+- `analysis/analyze.py`：批量结果聚合统计。
+- `analysis/plot_report.py`：报告图表（6 类图），写入 `data/report/`。
 
 ### 视频录制：record_flight.sh
 

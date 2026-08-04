@@ -45,10 +45,15 @@ def test_scenario_to_args_nonidealities_only_when_true():
     assert "--nonidealities" not in off
 
 
-def test_dry_run_lists_scenarios_and_writes_nothing():
-    BATCH_SUMMARY.unlink(missing_ok=True)
+def test_dry_run_lists_scenarios_and_writes_nothing(tmp_path, monkeypatch):
+    # 回归：不再 unlink 真实仓库里的 batch_summary.json（曾删掉被跟踪产物）。
+    # 把本测试模块的输出路径指到临时目录，保证完全不触碰真实 data/batch/。
+    import sys as _sys
+    monkeypatch.setattr(_sys.modules[__name__], "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(_sys.modules[__name__], "BATCH_SUMMARY",
+                        tmp_path / "data" / "batch" / "batch_summary.json")
     r = subprocess.run(
-        [sys.executable, str(PROJECT_ROOT / "scripts" / "batch_runner.py"),
+        [sys.executable, str(Path(__file__).resolve().parents[1] / "scripts" / "batch_runner.py"),
          "--repeat", "1", "--dry-run"],
         cwd=PROJECT_ROOT, capture_output=True, text=True)
     assert r.returncode == 0

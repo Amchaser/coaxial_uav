@@ -66,17 +66,32 @@ def main() -> int:
     p = argparse.ArgumentParser(description="Run the batch scenario matrix.")
     p.add_argument("--repeat", type=int, default=10)
     p.add_argument("--venv-python", default=str(Path.home() / ".venv-uav" / "bin" / "python"))
+    p.add_argument("--flight-timeout", type=float, default=150.0,
+                   help="per-flight subprocess timeout (stabilize + landing + margin)")
     p.add_argument("--dry-run", action="store_true", help="print scenario list only")
     args = p.parse_args()
 
     scenarios = build_matrix(repeat=args.repeat)
     summary = {"total": len(scenarios), "results": []}
+    if not args.dry_run:
+        venv_python = Path(args.venv_python)
+        if not venv_python.is_file():
+            print(f"ERROR: venv python not found: {venv_python}", file=sys.stderr)
+            print("  pass --venv-python /path/to/python or create ~/.venv-uav", file=sys.stderr)
+            return 1
     for i, s in enumerate(scenarios, 1):
         if args.dry_run:
             print(f"[{i}/{len(scenarios)}] {s['tag']}")
             continue
         cmd = [args.venv_python, str(RUN_ONE), *scenario_to_args(s)]
-        proc = subprocess.run(cmd, capture_output=True, text=True)
+        try:
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=args.flight_timeout)
+        except subprocess.TimeoutExpired:
+            result = {"tag": s["tag"], "returncode": -1, "outcome": "TIMEOUT_RUN",
+                      "stderr": f"exceeded {args.flight_timeout}s flight timeout"}
+            summary["results"].append(result)
+            print(f"[{i}/{len(scenarios)}] {s['tag']} -> TIMEOUT_RUN", flush=True)
+            continue
         result = {"tag": s["tag"], "returncode": proc.returncode}
         try:
             meta = json.loads(proc.stdout.strip().splitlines()[-1])

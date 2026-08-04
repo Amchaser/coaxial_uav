@@ -40,3 +40,45 @@ def test_reset_pose_builds_command():
     assert "position: {" in req
     assert "x: 1.0" in req
     assert "z: 0.34" in req
+
+
+def test_reset_pose_timeout():
+    import subprocess as _subprocess
+    from scripts.reset_pose import reset_pose
+    with mock.patch("subprocess.run", side_effect=_subprocess.TimeoutExpired("cmd", 5)):
+        r = reset_pose("p", "w", "m", 0.0, 0.0, 0.34)
+    assert r["ok"] is False
+    assert "timed out" in r["message"]
+
+
+def test_reset_pose_nonzero_returncode():
+    from scripts.reset_pose import reset_pose
+    with mock.patch("subprocess.run",
+                    return_value=mock.Mock(returncode=1, stdout="", stderr="boom")):
+        r = reset_pose("p", "w", "m", 0.0, 0.0, 0.34)
+    assert r["ok"] is False
+    assert "boom" in r["message"]
+
+
+def test_reset_pose_data_false_reply():
+    from scripts.reset_pose import reset_pose
+    proc = mock.Mock(returncode=0, stdout="data: false\n", stderr="")
+    with mock.patch("subprocess.run", return_value=proc):
+        r = reset_pose("p", "w", "m", 0.0, 0.0, 0.34)
+    assert r["ok"] is False
+
+
+def test_reset_pose_data_true_reply():
+    from scripts.reset_pose import reset_pose
+    proc = mock.Mock(returncode=0, stdout="data: true\n", stderr="")
+    with mock.patch("subprocess.run", return_value=proc):
+        r = reset_pose("p", "w", "m", 0.0, 0.0, 0.34)
+    assert r["ok"] is True
+
+
+def test_reset_pose_missing_gz_binary():
+    from scripts.reset_pose import reset_pose
+    with mock.patch("subprocess.run", side_effect=FileNotFoundError):
+        r = reset_pose("p", "w", "m", 0.0, 0.0, 0.34)
+    assert r["ok"] is False
+    assert "gz binary not found" in r["message"]

@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import math
 import sys
 from pathlib import Path
 
@@ -154,12 +153,14 @@ def plot_landing_scatter(points: list[dict], out_png: str) -> None:
 
 
 def plot_disturbance_boxplot(points: list[dict], out_png: str) -> None:
+    if not points:
+        return  # 无数据：跳过，避免对空输入画箱线图
     by_group: dict[str, list[float]] = {}
     for p in points:
         by_group.setdefault(p["group"], []).append(abs(p["vz"]))
     groups = sorted(by_group)
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.boxplot([by_group[g] for g in groups], labels=groups)
+    ax.boxplot([by_group[g] for g in groups], tick_labels=groups)
     ax.set_ylabel("|touchdown vz| (m/s)")
     ax.set_title("扰动预设 vs 触水速度")
     fig.tight_layout()
@@ -177,6 +178,7 @@ def plot_success_rate(rows: list[dict], out_png: str) -> None:
     ax.axhline(90, color=C_GRAY, ls="--", lw=1, label="90% 目标")
     ax.set_ylabel("成功率 (%)")
     ax.set_ylim(0, 105)
+    ax.set_xticks(range(len(groups)))
     ax.set_xticklabels(groups, rotation=30, ha="right")
     ax.legend()
     fig.tight_layout()

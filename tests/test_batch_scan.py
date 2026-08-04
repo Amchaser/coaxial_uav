@@ -1,6 +1,6 @@
 import json
 
-from scripts.batch_scan import decide_result, expand_grid, tag_for
+from scripts.batch_scan import decide_result, expand_grid, tag_for, validate_grid
 
 
 def test_expand_grid_single_axis():
@@ -12,13 +12,31 @@ def test_expand_grid_single_axis():
 
 
 def test_expand_grid_two_axes_cartesian():
-    grid = {"height.kp": [45.0, 60.0], "landing.descent_vz": [-0.3, -0.5]}
+    grid = {"height.kp": [45.0, 60.0], "landing.descent_rate_m_s": [0.35, 0.45]}
     combos = expand_grid(grid)
     assert len(combos) == 4
 
 
 def test_tag_for():
     assert tag_for("height.kp", 60.0) == "scan_kp_60.0"
+
+
+def test_validate_grid_accepts_real_keys():
+    grid = {"height.kp": [40.0], "height.kd": [35.0],
+            "landing.descent_rate_m_s": [0.35], "landing.high_hover_z_m": [1.6],
+            "position_x.kp": [4.0], "position_velocity_limit_m_s": [2.0],
+            "target_z_m": [0.8]}
+    assert validate_grid(grid) == []
+
+
+def test_validate_grid_rejects_unknown_keys():
+    # 计划里的错误示例键：未知键会被 _publish_config 静默丢弃 -> 完全相同的组合
+    unknown = validate_grid({"height.kp": [40.0],
+                             "landing.descent_vz": [0.3],
+                             "landing.near_water_height": [0.2]})
+    assert "height.kp" not in unknown
+    assert "landing.descent_vz" in unknown
+    assert "landing.near_water_height" in unknown
 
 
 def test_scan_main_records_rc_and_fails_on_nonzero():

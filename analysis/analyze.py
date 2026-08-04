@@ -44,6 +44,13 @@ def _stats(values: list[float]) -> dict:
             "std": round(statistics.stdev(values), 4) if len(values) > 1 else 0.0}
 
 
+def _fmt(mean, std) -> str:
+    """Render a mean±std cell, using '—' when no data exists (e.g. 0 landed)."""
+    if mean is None:
+        return "—"
+    return f"{mean}±{std}"
+
+
 def aggregate(metas: list[dict]) -> list[dict]:
     groups: dict[str, list[dict]] = {}
     for m in metas:
@@ -101,9 +108,9 @@ def main() -> int:
     for r in rows:
         lines.append(
             f"| {r['group']} | {r['n']} | {r['landed']} | {r['success_rate']:.2f} "
-            f"| {r['touchdown_vz_mean']}±{r['touchdown_vz_std']} "
-            f"| {r['horizontal_error_mean']}±{r['horizontal_error_std']} "
-            f"| {r['max_roll_mean']}±{r['max_roll_std']} | {r['abort_reasons']} |")
+            f"| {_fmt(r['touchdown_vz_mean'], r['touchdown_vz_std'])} "
+            f"| {_fmt(r['horizontal_error_mean'], r['horizontal_error_std'])} "
+            f"| {_fmt(r['max_roll_mean'], r['max_roll_std'])} | {r['abort_reasons']} |")
     Path(args.out_md).write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"aggregated {len(metas)} metas -> {args.out_csv}")
     return 0

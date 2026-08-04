@@ -29,8 +29,20 @@ def test_build_config_moving_target():
              platform_vx=0.5, target_x=0.0, target_y=0.0, target_z=0.8,
              config_json="{}")
     cfg = build_config(a)
-    assert cfg["moving_target_enabled"] is True
-    assert cfg["target_vx_m_s"] == 0.5
+    # 移动平台必须走 landing.* 键（_publish_config 只发布 landing_ 前缀键）
+    assert cfg["landing"]["moving_target_enabled"] is True
+    assert cfg["landing"]["target_vx_m_s"] == 0.5
+    assert cfg["landing"]["target_vy_m_s"] == 0.0
+
+
+def test_build_config_static_platform_disabled():
+    a = Args(disturbance_preset="off", nonidealities=False,
+             platform_vx=0.0, target_x=0.0, target_y=0.0, target_z=0.8,
+             config_json="{}")
+    cfg = build_config(a)
+    # 静态基线显式关闭移动平台，避免从持久化 tuning_config 继承
+    assert cfg["landing"]["moving_target_enabled"] is False
+    assert cfg["landing"]["target_vx_m_s"] == 0.0
 
 
 def test_build_config_config_json_merge():
@@ -61,6 +73,34 @@ def test_takeoff_summary_overshoot():
     assert s["overshoot_m"] == 0.1
     assert s["t_liftoff_s"] == 2.0
     assert s["stabilize_time_s"] == 5.5
+
+
+def test_takeoff_summary_hover_error():
+    acc = {"max_z_m": 0.9, "target_z_m": 0.8, "hover_error_m": -0.074,
+           "stabilize_s": 5.5}
+    s = takeoff_summary(acc)
+    assert s["hover_error_m"] == -0.074
+
+
+def test_landing_row_from_status_fields():
+    from scripts.run_one_flight import landing_row_from_status
+    status = {"sim_time_s": 10.0, "landing_state": "SLOW_DESCENT",
+              "z_m": 0.30, "world_x_m": -4.95, "world_y_m": -5.03,
+              "landing_target_x_m": -5.0, "landing_target_y_m": -5.0,
+              "roll_rad": 0.01, "pitch_rad": -0.02, "yaw_rad": 0.0,
+              "upper_motor_rad_s": 100.0, "lower_motor_rad_s": 90.0,
+              "landing_horizontal_error_m": 0.058,
+              "landing_touchdown_vz_m_s": -0.2,
+              "buoyancy_compensation_n": 80.0, "slamming_force_n": 1.0}
+    row = landing_row_from_status(status, t=1.0)
+    assert row["state"] == "SLOW_DESCENT"
+    assert row["z_m"] == 0.30
+    assert row["x_m"] == -4.95
+    assert row["y_m"] == -5.03
+    assert row["horizontal_error_m"] == 0.058
+    assert row["touchdown_vz_m_s"] == -0.2
+    assert row["upper_rad_s"] == 100.0
+    assert row["lower_rad_s"] == 90.0
 
 
 from scripts.run_one_flight import deep_merge, landing_row

@@ -11,6 +11,7 @@ import argparse
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 
@@ -53,6 +54,20 @@ def format_pose_request_text(req: dict) -> str:
     )
 
 
+def _parse_boolean_reply(stdout: object) -> bool | None:
+    """Parse ``data: true`` / ``data: false`` from the gz.msgs.Boolean reply.
+
+    Returns True/False when the field is present, None when it is absent (in
+    which case the caller falls back to the process returncode).
+    """
+    if not isinstance(stdout, str):
+        return None
+    match = re.search(r"\bdata\s*:\s*(true|false)\b", stdout)
+    if match is None:
+        return None
+    return match.group(1) == "true"
+
+
 def reset_pose(partition: str, world: str, model: str,
                x: float, y: float, z: float, yaw: float = 0.0,
                timeout_ms: int = 5000) -> dict:
@@ -69,8 +84,14 @@ def reset_pose(partition: str, world: str, model: str,
                               timeout=(timeout_ms // 1000) + 5)
     except subprocess.TimeoutExpired:
         return {"ok": False, "message": "set_pose service call timed out"}
+    except FileNotFoundError:
+        return {"ok": False, "message": "gz binary not found (is Gazebo installed / on PATH?)"}
     if proc.returncode != 0:
         return {"ok": False, "message": proc.stderr.strip() or proc.stdout.strip()}
+    # 解析 Boolean 回复本体：data:false 意味着服务端拒绝了置位，returncode 仍是 0。
+    ok = _parse_boolean_reply(proc.stdout)
+    if ok is False:
+        return {"ok": False, "message": proc.stdout.strip() or "set_pose replied data: false"}
     return {"ok": True, "message": proc.stdout.strip()}
 
 
