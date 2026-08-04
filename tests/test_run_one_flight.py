@@ -79,9 +79,20 @@ def test_landing_row_fields():
           "motors": {"upper_rad_s": 100.0, "lower_rad_s": 90.0},
           "stats": {"sim_time_s": 10.0}}
     status = {"landing_state": "SLOW_DESCENT", "landing_horizontal_error_m": 0.2,
-              "landing_touchdown_vz_m_s": -0.1}
+              "landing_touchdown_vz_m_s": -0.1,
+              "landing_target_x_m": -5.0, "landing_target_y_m": -5.0}
     row = landing_row(st, status, t=1.0)
     assert row["state"] == "SLOW_DESCENT"
     assert row["z_m"] == 0.30
     assert row["horizontal_error_m"] == 0.2
     assert row["touchdown_vz_m_s"] == -0.1
+    assert row["target_x_m"] == -5.0
+    assert row["target_y_m"] == -5.0
+
+
+def test_landing_row_target_defaults_when_status_missing():
+    st = {"position": {"z": 0.30}, "attitude": {}, "motors": {},
+          "stats": {"sim_time_s": 10.0}}
+    row = landing_row(st, None, t=1.0)
+    assert row["target_x_m"] == 0.0
+    assert row["target_y_m"] == 0.0

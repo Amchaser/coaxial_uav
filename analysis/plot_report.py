@@ -88,14 +88,27 @@ def build_landing_points(batch_dir: Path) -> list[dict]:
             continue
         last = rows[-1]
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
-        pts.append({
+        # 优先用目标相对坐标：x/y 相对降落目标，验收圈原点即目标（世界系不再混用）
+        has_target = "target_x_m" in last and "target_y_m" in last
+        if has_target:
+            rx = float(last["x_m"]) - float(last["target_x_m"])
+            ry = float(last["y_m"]) - float(last["target_y_m"])
+        else:
+            # 旧数据（无目标列）：退化为 horizontal_error_m，y 置 0，仍落在验收圈语义内
+            rx = float(last.get("horizontal_error_m", 0.0))
+            ry = 0.0
+        pt = {
             "tag": d.name,
-            "x": float(last["x_m"]),
-            "y": float(last["y_m"]),
+            "x": rx,
+            "y": ry,
             "vz": float(last["touchdown_vz_m_s"]),
+            "relative": has_target,
             "outcome": meta.get("outcome", "UNKNOWN"),
             "group": meta.get("scenario", {}).get("disturbance_preset", "off"),
-        })
+        }
+        if "horizontal_error_m" in last:
+            pt["horizontal_error_m"] = float(last["horizontal_error_m"])
+        pts.append(pt)
     return pts
 
 
@@ -126,10 +139,15 @@ def plot_landing_scatter(points: list[dict], out_png: str) -> None:
     ax.scatter(xs, ys, c=C_BLUE, s=30, alpha=0.7)
     ax.add_patch(plt.Circle((0, 0), 0.3, fill=False, color=C_ORANGE, lw=1.5,
                             label="0.3m 验收圈"))
-    ax.set_xlabel("x (m)")
-    ax.set_ylabel("y (m)")
+    ax.set_xlabel("落点 x 相对目标 (m)")
+    ax.set_ylabel("落点 y 相对目标 (m)")
     ax.set_aspect("equal")
     ax.legend()
+    title = f"落点分布（{len(points)} 次）"
+    errs = [p["horizontal_error_m"] for p in points if "horizontal_error_m" in p]
+    if errs:
+        title += f"\n水平误差 mean±std: {np.mean(errs):.3f}±{np.std(errs):.3f} m"
+    ax.set_title(title)
     fig.tight_layout()
     fig.savefig(out_png, dpi=150)
     plt.close(fig)
@@ -168,11 +186,11 @@ def plot_success_rate(rows: list[dict], out_png: str) -> None:
 
 def plot_touchdown_safety(points: list[dict], out_png: str) -> None:
     fig, ax = plt.subplots(figsize=(8, 6))
-    xs = [p["x"] for p in points]  # 落点偏差近似用 |x|+|y|
+    xs = [p.get("horizontal_error_m", abs(p["x"])) for p in points]
     vs = [abs(p["vz"]) for p in points]
     ax.scatter(xs, vs, c=C_BLUE, s=30, alpha=0.7)
     ax.axhline(0.35, color=C_GREEN, ls="--", lw=1.5, label="vz 安全边界 0.35 m/s")
-    ax.set_xlabel("落点 |x| (m)")
+    ax.set_xlabel("落点水平误差 (m)")
     ax.set_ylabel("触水 |vz| (m/s)")
     ax.legend()
     fig.tight_layout()

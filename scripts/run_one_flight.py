@@ -118,6 +118,8 @@ def landing_row(st: dict, status: dict | None, t: float) -> dict:
         "z_m": float(st["position"]["z"]),
         "x_m": float(st["position"].get("x", 0.0)),
         "y_m": float(st["position"].get("y", 0.0)),
+        "target_x_m": float(status.get("landing_target_x_m", 0.0)),
+        "target_y_m": float(status.get("landing_target_y_m", 0.0)),
         "roll_deg": round(float(att.get("roll_rad", 0.0)) * 57.29578, 4),
         "pitch_deg": round(float(att.get("pitch_rad", 0.0)) * 57.29578, 4),
         "yaw_deg": round(float(att.get("yaw_rad", 0.0)) * 57.29578, 4),
@@ -219,7 +221,8 @@ def main() -> int:
         outcome = "ABORTED"
 
     # 4) 落盘
-    fields = ["t_s", "sim_time_s", "state", "z_m", "x_m", "y_m", "roll_deg",
+    fields = ["t_s", "sim_time_s", "state", "z_m", "x_m", "y_m", "target_x_m",
+              "target_y_m", "roll_deg",
               "pitch_deg", "yaw_deg", "upper_rad_s", "lower_rad_s",
               "horizontal_error_m", "touchdown_vz_m_s", "abort_reason",
               "disturbance_active", "buoyancy_n", "slamming_force_n"]
