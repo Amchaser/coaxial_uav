@@ -1,6 +1,6 @@
 import json
 
-from scripts.batch_scan import decide_result, expand_grid, tag_for, validate_grid
+from scripts.batch_scan import decide_result, expand_grid, sim_command, tag_for, validate_grid
 
 
 def test_expand_grid_single_axis():
@@ -62,3 +62,13 @@ def test_decide_result_nonzero_with_unparseable_stdout():
     assert result["rc"] == 2
     assert result["outcome"] == "FAILED"
     assert result["reported_outcome"] == "PARSE_FAIL"
+
+
+def test_sim_command_includes_run_and_headless_flags():
+    cmd = sim_command("/worlds/static_water_takeoff.sdf")
+    assert cmd[0] == "gz"
+    assert cmd[1] == "sim"
+    # -r (run, not paused) and -s (headless) must both be present.
+    assert "-r" in cmd
+    assert "-s" in cmd
+    assert "/worlds/static_water_takeoff.sdf" in cmd

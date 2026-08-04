@@ -135,6 +135,16 @@ def decide_result(tag: str, returncode: int, stdout: str) -> dict:
     return {"tag": tag, "rc": 0, "outcome": reported}
 
 
+def sim_command(world: str) -> list[str]:
+    """Build the headless gz sim launch command for a scan combo.
+
+    ``-r`` is required: without it gz sim starts paused and the world never
+    advances, so the flight never progresses (see run_static_water.sh which
+    always appends ``-r``). ``-s`` runs headless (no GUI).
+    """
+    return ["gz", "sim", "-r", "-s", world]
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description="Headless PID/landing parameter scan.")
     p.add_argument("--grid", required=True, help="JSON dict, e.g. '{\"height.kp\":[45.0,60.0]}'")
@@ -175,7 +185,7 @@ def main() -> int:
         env["GZ_SIM_RESOURCE_PATH"] = f"{PROJECT_ROOT}/models"
         env["GZ_SIM_SYSTEM_PLUGIN_PATH"] = f"{PROJECT_ROOT}/build/plugins"
         gz = subprocess.Popen(
-            ["gz", "sim", "-s", f"{PROJECT_ROOT}/worlds/static_water_takeoff.sdf"],
+            sim_command(f"{PROJECT_ROOT}/worlds/static_water_takeoff.sdf"),
             env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
             time.sleep(10)  # 等世界加载
